@@ -1,0 +1,36 @@
+<tr>
+    <td>.</td>
+    <td class="first"><a class="text-decoration-none text-reset" href="{% url 'rating:player_detail' post.name.id %}"> {{ post.name.name }}</a></td>
+    <td>{{ post.age }}</td>
+    <td>
+        <a href="{% url 'rating:team_players_in_season' post.team post.season %}"> 
+            {{ post.team }}
+        </a>
+    </td>
+    <td>{{ post.game }}</td>
+
+    {% if stat_rule == 'goal' %}
+        <td class="table-warning">{{ post.goal }}</td>
+    {% elif stat_rule != 'goal' %}
+        <td>{{ post.goal }}</td>
+    {% endif %}
+
+    {% if stat_rule == 'assist' %}
+        <td class="table-warning">{{ post.assist }}</td>
+    {% elif stat_rule != 'assist' %}
+        <td>{{ post.assist }}</td>
+    {% endif %}
+
+    {% if stat_rule == 'point' %}
+        <td class="table-warning">{{ post.point }}</td>
+    {% elif stat_rule != 'point' %}
+        <td>{{ post.point }}</td>
+    {% endif %}
+
+    {% if stat_rule == 'penalty' %}
+        <td class="table-warning">{{ post.penalty }}</td>
+    {% elif stat_rule != 'penalty' %}
+        <td>{{ post.penalty }}</td>
+    {% endif %}
+
+</tr>
