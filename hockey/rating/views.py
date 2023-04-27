@@ -4,7 +4,7 @@
 from django.db.models import Sum
 from django.shortcuts import get_object_or_404, render
 
-from .models import Player, Statistic, Team_for_table
+from .models import Player, Statistic, TeamForTable
 from .secondary import (
     prev_next_season, top_goal, top_point, top_season_goal, top_season_point,
 )
@@ -12,9 +12,9 @@ from .secondary import (
 
 def index(request):
     total_points_for_players = Statistic.objects.values(
-        'name__id', 'name__name') \
-        .annotate(game=Sum('game'), point=Sum('point')) \
-        .order_by('-point', 'game')[:20]
+        'name__id', 'name__name').annotate(
+            game=Sum('game'), point=Sum('point')).order_by(
+                '-point', 'game')[:20]
     template = 'posts/index.html'
     context = {
         'page_obj': total_points_for_players,
@@ -27,10 +27,10 @@ def team_players_in_season(request, team, season):
     team_statistic = Statistic.objects.filter(
         team__title=team, season__name=season
     )
-    next_season = season[:2] + str(int((season)[2:4]) + 1) + \
-        season[4:5] + str(int(season[5:]) + 1)
-    previous_season = season[:2] + str(int((season)[2:4]) - 1) + \
-        season[4:5] + str(int(season[5:]) - 1)
+    next_season = season[:2] + str(
+        int((season)[2:4]) + 1) + season[4:5] + str(int(season[5:]) + 1)
+    previous_season = season[:2] + str(
+        int((season)[2:4]) - 1) + season[4:5] + str(int(season[5:]) - 1)
     template = 'posts/team_players_in_season.html'
     context = {
         'team': team,
@@ -105,15 +105,16 @@ def best_of_season(request, season, stat_rule):
 
 
 def all_time_all_player_one_team(request, team):
-    total_points_for_players = Statistic.objects.all() \
-        .filter(team__title=team) \
-        .values('name__id', 'name__name') \
-        .annotate(
-            games=Sum('game'), goals=Sum('goal'), assists=Sum('assist'),
-            points=Sum('point'), penalty=Sum('penalty')).order_by(
-        '-points', '-goals', 'games')
-    # total_points_for_players_20 = total_points_for_players
-    # total_points_for_players_all = total_points_for_players[20:]
+    total_points_for_players = Statistic.objects.all().filter(
+        team__title=team).values(
+            'name__id',
+            'name__name').annotate(
+            games=Sum('game'),
+            goals=Sum('goal'),
+            assists=Sum('assist'),
+            points=Sum('point'),
+            penalty=Sum('penalty')).order_by(
+                '-points', '-goals', 'games')
     template = 'posts/all_time_all_player_one_team.html'
     context = {
         'page_obj': total_points_for_players,
@@ -128,72 +129,80 @@ def all_time_all_player_one_team(request, team):
 
 def statistic(request, stat_rule):
     if stat_rule == 'goals_career':
-        total_goals_for_players = Statistic.objects.all() \
-            .values('name__id', 'name__name') \
-            .annotate(game=Sum('game'), goal=Sum('goal')) \
-            .order_by('-goal', 'game')[:20]
+        total_goals_for_players = Statistic.objects.all().values(
+            'name__id', 'name__name').annotate(
+                game=Sum('game'),
+                goal=Sum('goal')).order_by('-goal', 'game')[:20]
         context = {
             'page_obj': total_goals_for_players,
             'table_name': 'Career Leaders for Goals'
         }
     elif stat_rule == 'goals_season':
-        total_goals_for_players = Statistic.objects \
-            .values('name__id', 'name__name', 'season__name', 'game', 'goal') \
-            .order_by('-goal', 'game')[:20]
+        total_goals_for_players = Statistic.objects.values(
+            'name__id',
+            'name__name',
+            'season__name',
+            'game', 'goal').order_by('-goal', 'game')[:20]
         context = {
             'page_obj': total_goals_for_players,
             'table_name': 'Single Season Leaders for Goals'
         }
     elif stat_rule == 'assist_career':
-        total_assist_for_players = Statistic.objects.all() \
-            .values('name__id', 'name__name') \
-            .annotate(game=Sum('game'), assist=Sum('assist')) \
-            .order_by('-assist', 'game')[:20]
+        total_assist_for_players = Statistic.objects.all().values(
+            'name__id',
+            'name__name').annotate(
+                game=Sum('game'),
+                assist=Sum('assist')).order_by('-assist', 'game')[:20]
         context = {
             'page_obj': total_assist_for_players,
             'table_name': 'Career Leaders for Assist'
         }
     elif stat_rule == 'assist_season':
-        total_assist_for_players = Statistic.objects \
-            .values(
-                'name__id', 'name__name', 'season__name', 'game', 'assist') \
-            .order_by('-assist', 'game')[:20]
+        total_assist_for_players = Statistic.objects.values(
+            'name__id',
+            'name__name',
+            'season__name',
+            'game',
+            'assist').order_by('-assist', 'game')[:20]
         context = {
             'page_obj': total_assist_for_players,
             'table_name': 'Single Season Leaders for Assist'
         }
     elif stat_rule == 'point_season':
-        total_point_for_players = Statistic.objects \
-            .values(
-                'name__id', 'name__name', 'season__name', 'game', 'point') \
-            .order_by('-point', 'game')[:20]
+        total_point_for_players = Statistic.objects.values(
+            'name__id',
+            'name__name',
+            'season__name',
+            'game',
+            'point').order_by('-point', 'game')[:20]
         context = {
             'page_obj': total_point_for_players,
             'table_name': 'Single Season Leaders for Points'
         }
     elif stat_rule == 'games_career':
-        total_games_for_players = Statistic.objects.all() \
-            .values('name__id', 'name__name') \
-            .annotate(game=Sum('game')) \
-            .order_by('-game')[:20]
+        total_games_for_players = Statistic.objects.values(
+            'name__id',
+            'name__name').annotate(
+                game=Sum('game')).order_by('-game')[:20]
         context = {
             'page_obj': total_games_for_players,
             'table_name': 'Career Leaders for Games'
         }
     elif stat_rule == 'penalty_career':
-        total_penalty_for_players = Statistic.objects.all() \
-            .values('name__id', 'name__name') \
-            .annotate(game=Sum('game'), penalty=Sum('penalty')) \
-            .order_by('-penalty', 'game')[:20]
+        total_penalty_for_players = Statistic.objects.values(
+            'name__id', 'name__name').annotate(
+                game=Sum('game'),
+                penalty=Sum('penalty')).order_by('-penalty', 'game')[:20]
         context = {
             'page_obj': total_penalty_for_players,
             'table_name': 'Career Leaders for Penalty'
         }
     elif stat_rule == 'penalty_season':
-        total_penalty_for_players = Statistic.objects \
-            .values(
-                'name__id', 'name__name', 'season__name', 'game', 'penalty') \
-            .order_by('-penalty', 'game')[:20]
+        total_penalty_for_players = Statistic.objects.values(
+            'name__id',
+            'name__name',
+            'season__name',
+            'game', 'penalty').order_by('-penalty', 'game')[:20]
         context = {
             'page_obj': total_penalty_for_players,
             'table_name': 'Single Season Leaders for Penalty'
@@ -203,40 +212,39 @@ def statistic(request, stat_rule):
 
 
 def create_table(request, season):
-    teams = Team_for_table.objects.all() \
-        .filter(season__name=season).order_by('rank')
-    next_season = season[:2] + str(int((season)[2:4]) + 1) + \
-        season[4:5] + str(int(season[5:]) + 1)
-    previous_season = season[:2] + str(int((season)[2:4]) - 1) + \
-        season[4:5] + str(int(season[5:]) - 1)
+    teams = TeamForTable.objects.filter(season__name=season).order_by('rank')
+    next_season = season[:2] + str(
+        int((season)[2:4]) + 1) + season[4:5] + str(int(season[5:]) + 1)
+    previous_season = season[:2] + str(
+        int((season)[2:4]) - 1) + season[4:5] + str(int(season[5:]) - 1)
     query_top_5_1 = Statistic.objects.filter(
-        season__name=season).values('name__id', 'name__name', 'team__slug') \
-        .annotate(game=Sum('game'), point=Sum('point')) \
-        .order_by('-point', 'game')[:5]
-    # print(query_top_5_1)
-    # top_5 = serializers.serialize(
-    #     "json",
-    #     query_top_5,
-    #     fields=("name", 'team', "point"),
-    #     use_natural_foreign_keys=True
-    # )
-    # serialized_data_top_5 = json.loads(top_5)
-    ####
+        season__name=season).values(
+            'name__id',
+            'name__name',
+            'team__slug').annotate(
+                game=Sum('game'),
+                point=Sum('point')).order_by('-point', 'game')[:5]
     top_5_goal = Statistic.objects.filter(
-        season__name=season).values('name__id', 'name__name', 'team__slug') \
-        .annotate(game=Sum('game'), goal=Sum('goal')) \
-        .order_by('-goal', 'game')[:5]
-    #####
+        season__name=season).values(
+            'name__id',
+            'name__name',
+            'team__slug').annotate(
+                game=Sum('game'),
+                goal=Sum('goal')).order_by('-goal', 'game')[:5]
     top_5_assist = Statistic.objects.filter(
-        season__name=season).values('name__id', 'name__name', 'team__slug') \
-        .annotate(game=Sum('game'), assist=Sum('assist')) \
-        .order_by('-assist', 'game')[:5]
-    #####
+        season__name=season).values(
+            'name__id',
+            'name__name',
+            'team__slug').annotate(
+                game=Sum('game'),
+                assist=Sum('assist')).order_by('-assist', 'game')[:5]
     top_5_penalty = Statistic.objects.filter(
-        season__name=season).values('name__id', 'name__name', 'team__slug') \
-        .annotate(game=Sum('game'), penalty=Sum('penalty')) \
-        .order_by('-penalty', 'game')[:5]
-    #####
+        season__name=season).values(
+            'name__id',
+            'name__name',
+            'team__slug').annotate(
+                game=Sum('game'),
+                penalty=Sum('penalty')).order_by('-penalty', 'game')[:5]
     template = 'table/teams_table.html'
     context = {
         'previous_season': previous_season,
@@ -253,22 +261,25 @@ def create_table(request, season):
 
 def leaders_career(request, team):
     top_10_game = Statistic.objects.filter(
-        team__title=team).values('name__id', 'name__name') \
-        .annotate(game=Sum('game')) \
-        .order_by('-game')[:10]
+        team__title=team).values(
+            'name__id',
+            'name__name').annotate(
+                game=Sum('game')).order_by('-game')[:10]
     top_10_goal = Statistic.objects.filter(
-        team__title=team).values('name__id', 'name__name') \
-        .annotate(goal=Sum('goal')) \
-        .order_by('-goal')[:10]
+        team__title=team).values(
+            'name__id',
+            'name__name').annotate(
+                goal=Sum('goal')).order_by('-goal')[:10]
     top_10_assist = Statistic.objects.filter(
-        team__title=team).values('name__id', 'name__name') \
-        .annotate(assist=Sum('assist')) \
-        .order_by('-assist')[:10]
+        team__title=team).values(
+            'name__id',
+            'name__name').annotate(
+                assist=Sum('assist')).order_by('-assist')[:10]
     top_10_penalty = Statistic.objects.filter(
-        team__title=team).values('name__id', 'name__name') \
-        .annotate(penalty=Sum('penalty')) \
-        .order_by('-penalty')[:10]
-    # top_goal(team)
+        team__title=team).values(
+            'name__id',
+            'name__name').annotate(
+                penalty=Sum('penalty')).order_by('-penalty')[:10]
     context = {
         'top_10_game': top_10_game,
         'top_10_goal': top_10_goal,
@@ -287,20 +298,28 @@ def leaders_career(request, team):
 def season_leaders(request, team):
     top_10_goal = Statistic.objects.filter(
         team__title=team).values(
-            'name__id', 'name__name', 'goal', 'season__name') \
-        .order_by('-goal')[:10]
+            'name__id',
+            'name__name',
+            'goal',
+            'season__name').order_by('-goal')[:10]
     top_10_assist = Statistic.objects.filter(
         team__title=team).values(
-        'name__id', 'name__name', 'assist', 'season__name') \
-        .order_by('-assist')[:10]
+            'name__id',
+            'name__name',
+            'assist',
+            'season__name').order_by('-assist')[:10]
     top_10_point = Statistic.objects.filter(
         team__title=team).values(
-        'name__id', 'name__name', 'point', 'season__name') \
-        .order_by('-point')[:10]
+            'name__id',
+            'name__name',
+            'point',
+            'season__name').order_by('-point')[:10]
     top_10_penalty = Statistic.objects.filter(
         team__title=team).values(
-        'name__id', 'name__name', 'penalty', 'season__name') \
-        .order_by('-penalty')[:10]
+            'name__id',
+            'name__name',
+            'penalty',
+            'season__name').order_by('-penalty')[:10]
     context = {
         'top_10_goal': top_10_goal,
         'top_10_assist': top_10_assist,
@@ -317,7 +336,7 @@ def season_leaders(request, team):
 
 
 def history_team(request, team):
-    team_view = Team_for_table.objects.filter(
+    team_view = TeamForTable.objects.filter(
         name__title=team).order_by('-season')
     count_season = team_view.count()
     context = {

@@ -124,7 +124,7 @@ class Statistic(models.Model):
         ordering = ('-point', '-goal', 'game')
 
 
-class Team_for_table(models.Model):
+class TeamForTable(models.Model):
     rank = models.IntegerField('Место')
     name = models.ForeignKey(
         Team,
@@ -158,7 +158,7 @@ class Team_for_table(models.Model):
 
     def save(self, *args, **kwargs):
         self.points_percentage = self.get_points_percentage
-        super(Team_for_table, self).save(*args, **kwargs)
+        super(TeamForTable, self).save(*args, **kwargs)
 
     class Meta:
         ordering = ('-points_percentage',)
