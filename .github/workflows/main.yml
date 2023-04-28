@@ -66,8 +66,12 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         passphrase: ${{ secrets.PASSPHRASE }} # Если ваш ssh-ключ защищён фразой-паролем
         script: |
-          # Выполняет pull образа с DockerHub
-          sudo docker pull ${{ secrets.DOCKER_USERNAME }}/hockey_docker:latest
-          #остановка всех контейнеров
-          sudo docker stop $(sudo docker ps -a -q)
-          sudo docker run --rm -d -p 5000:5000 ${{ secrets.DOCKER_USERNAME }}/hockey_docker:latest
+          sudo docker-compose stop
+          sudo docker-compose rm -f web
+          sudo docker image rm ${{ secrets.DOCKER_USERNAME }}/hockey_docker:latest
+          sudo docker-compose up -d
+          sudo docker-compose exec web python manage.py makemigrations
+          sudo docker-compose exec web python manage.py migrate
+          sudo docker-compose exec web python manage.py collectstatic --no-input
+          sudo systemctl daemon-reload
+          sudo systemctl restart gunicorn
