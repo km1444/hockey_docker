@@ -45,7 +45,7 @@ jobs:
         # Пуш образа в Docker Hub 
         uses: docker/build-push-action@v2 
         with:
-          context: .
+          context: ./hockey
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/hockey_docker:latest
 
@@ -63,7 +63,7 @@ jobs:
         script: |
           sudo docker-compose stop
           sudo docker-compose rm -f web
-          sudo docker image rm ${{ secrets.DOCKER_USERNAME }}/hockey_docker:latest
+          sudo docker image rm ${{ secrets.DOCKER_USERNAME }}/hockey_docker
           sudo docker pull km144/docker_hockey
           rm .env
           touch .env
