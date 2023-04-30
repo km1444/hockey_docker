@@ -69,7 +69,7 @@ jobs:
         script: |
           sudo docker-compose stop
           sudo docker-compose rm -f web
-          sudo docker image rm ${{ secrets.DOCKER_USERNAME }}/hockey_docker:latest
+          sudo docker image rm ${{ secrets.DOCKER_USERNAME }}/hockey_docker
           rm .env
           touch .env
           echo DB_ENGINE=${{ secrets.DB_ENGINE }} >> .env
