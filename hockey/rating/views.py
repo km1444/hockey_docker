@@ -1,4 +1,5 @@
 # from aggregates import StringAgg
+from django.contrib.postgres.aggregates.general import StringAgg
 # from django.core.paginator import Paginator
 # from django.db import models
 from django.db.models import Sum
@@ -14,7 +15,7 @@ def index(request):
     total_points_for_players = Statistic.objects.values(
         'name__id', 'name__name').annotate(
             game=Sum('game'), point=Sum('point')).order_by(
-                '-point', 'game')[:20]
+                '-point', 'game')[:50]
     template = 'posts/index.html'
     context = {
         'page_obj': total_points_for_players,
@@ -79,26 +80,22 @@ def player_detail(request, id):
 
 
 def best_of_season(request, season, stat_rule):
-    # queryset_season = Statistic.objects.filter(season__name=season)
-    if stat_rule == 'goal':
-        player_scores = Statistic.objects.filter(
-            season__name=season).order_by('-goal', 'game', '-point')[:20]
-    if stat_rule == 'assist':
-        player_scores = Statistic.objects.filter(season__name=season).order_by(
-            '-assist', 'game', '-point')[:20]
-    if stat_rule == 'point':
-        player_scores = Statistic.objects.filter(
-            season__name=season).order_by('-point', '-goal', 'game')[:20]
-    if stat_rule == 'penalty':
-        player_scores = Statistic.objects.filter(
-            season__name=season).order_by('-penalty', 'game', )[:20]
+    player_scores = Statistic.objects.filter(
+        season__name=season).values(
+            'name__id', 'name__name', 'age').annotate(
+                team=StringAgg('team__slug', delimiter=','),
+                game=Sum('game'),
+                goal=Sum('goal'),
+                assist=Sum('assist'),
+                point=Sum('point'),
+                penalty=Sum('penalty')).order_by(
+                    f'-{stat_rule}', '-goal', 'game')[:50]
     template = 'posts/best_of_season.html'
     context = {
         'season': season,
         'previous_season': prev_next_season(season)[1],
         'next_season': prev_next_season(season)[0],
         'page_obj': player_scores,
-        # 'page_obj_all': player_scores_all,
         'stat_rule': stat_rule
     }
     return render(request, template, context)
@@ -132,7 +129,7 @@ def statistic(request, stat_rule):
         total_goals_for_players = Statistic.objects.all().values(
             'name__id', 'name__name').annotate(
                 game=Sum('game'),
-                goal=Sum('goal')).order_by('-goal', 'game')[:20]
+                goal=Sum('goal')).order_by('-goal', 'game')[:50]
         context = {
             'page_obj': total_goals_for_players,
             'table_name': 'Career Leaders for Goals'
@@ -142,7 +139,8 @@ def statistic(request, stat_rule):
             'name__id',
             'name__name',
             'season__name',
-            'game', 'goal').order_by('-goal', 'game')[:20]
+            'game',
+            'goal').order_by('-goal', 'game')[:50]
         context = {
             'page_obj': total_goals_for_players,
             'table_name': 'Single Season Leaders for Goals'
@@ -152,7 +150,7 @@ def statistic(request, stat_rule):
             'name__id',
             'name__name').annotate(
                 game=Sum('game'),
-                assist=Sum('assist')).order_by('-assist', 'game')[:20]
+                assist=Sum('assist')).order_by('-assist', 'game')[:50]
         context = {
             'page_obj': total_assist_for_players,
             'table_name': 'Career Leaders for Assist'
@@ -163,7 +161,7 @@ def statistic(request, stat_rule):
             'name__name',
             'season__name',
             'game',
-            'assist').order_by('-assist', 'game')[:20]
+            'assist').order_by('-assist', 'game')[:50]
         context = {
             'page_obj': total_assist_for_players,
             'table_name': 'Single Season Leaders for Assist'
@@ -174,7 +172,7 @@ def statistic(request, stat_rule):
             'name__name',
             'season__name',
             'game',
-            'point').order_by('-point', 'game')[:20]
+            'point').order_by('-point', 'game')[:50]
         context = {
             'page_obj': total_point_for_players,
             'table_name': 'Single Season Leaders for Points'
@@ -183,7 +181,7 @@ def statistic(request, stat_rule):
         total_games_for_players = Statistic.objects.values(
             'name__id',
             'name__name').annotate(
-                game=Sum('game')).order_by('-game')[:20]
+                game=Sum('game')).order_by('-game')[:50]
         context = {
             'page_obj': total_games_for_players,
             'table_name': 'Career Leaders for Games'
@@ -192,7 +190,7 @@ def statistic(request, stat_rule):
         total_penalty_for_players = Statistic.objects.values(
             'name__id', 'name__name').annotate(
                 game=Sum('game'),
-                penalty=Sum('penalty')).order_by('-penalty', 'game')[:20]
+                penalty=Sum('penalty')).order_by('-penalty', 'game')[:50]
         context = {
             'page_obj': total_penalty_for_players,
             'table_name': 'Career Leaders for Penalty'
@@ -202,7 +200,7 @@ def statistic(request, stat_rule):
             'name__id',
             'name__name',
             'season__name',
-            'game', 'penalty').order_by('-penalty', 'game')[:20]
+            'game', 'penalty').order_by('-penalty', 'game')[:50]
         context = {
             'page_obj': total_penalty_for_players,
             'table_name': 'Single Season Leaders for Penalty'
@@ -213,10 +211,6 @@ def statistic(request, stat_rule):
 
 def create_table(request, season):
     teams = TeamForTable.objects.filter(season__name=season).order_by('rank')
-    next_season = season[:2] + str(
-        int((season)[2:4]) + 1) + season[4:5] + str(int(season[5:]) + 1)
-    previous_season = season[:2] + str(
-        int((season)[2:4]) - 1) + season[4:5] + str(int(season[5:]) - 1)
     query_top_5_1 = Statistic.objects.filter(
         season__name=season).values(
             'name__id',
@@ -247,8 +241,8 @@ def create_table(request, season):
                 penalty=Sum('penalty')).order_by('-penalty', 'game')[:5]
     template = 'table/teams_table.html'
     context = {
-        'previous_season': previous_season,
-        'next_season': next_season,
+        'previous_season': prev_next_season(season)[1],
+        'next_season': prev_next_season(season)[0],
         'page_obj': teams,
         'season': season,
         'top_5': query_top_5_1,
