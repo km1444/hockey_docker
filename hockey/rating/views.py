@@ -15,7 +15,7 @@ def index(request):
     total_points_for_players = Statistic.objects.values(
         'name__id', 'name__name').annotate(
             game=Sum('game'), point=Sum('point')).order_by(
-                '-point', 'game')[:50]
+                '-point', 'game')[:60]
     template = 'posts/index.html'
     context = {
         'page_obj': total_points_for_players,
