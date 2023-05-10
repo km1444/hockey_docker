@@ -59,9 +59,9 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         passphrase: ${{ secrets.PASSPHRASE }}
         script: |
+          sudo docker pull km144/hockey_docker
           sudo docker-compose stop
           sudo docker-compose rm -f web
-          sudo docker pull km144/hockey_docker
           rm .env
           touch .env
           echo DB_ENGINE=${{ secrets.DB_ENGINE }} >> .env
@@ -70,9 +70,9 @@ jobs:
           echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> .env
           echo DB_HOST=${{ secrets.DB_HOST }} >> .env
           echo DB_PORT=${{ secrets.DB_PORT }} >> .env
-          sudo -S docker-compose up -d
-          sudo docker-compose exec web python manage.py makemigrations
-          sudo docker-compose exec web python manage.py migrate
-          sudo docker-compose exec web python manage.py collectstatic --no-input
+          sudo -S docker-compose up -d --build
+          sudo docker-compose exec -T web python manage.py makemigrations
+          sudo docker-compose exec -T web python manage.py migrate
+          sudo docker-compose exec -T web python manage.py collectstatic --no-input
           sudo systemctl daemon-reload
           sudo systemctl restart gunicorn
