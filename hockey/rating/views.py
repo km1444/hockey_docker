@@ -15,7 +15,7 @@ def index(request):
     total_points_for_players = Statistic.objects.values(
         'name__id', 'name__name').annotate(
             game=Sum('game'), point=Sum('point')).order_by(
-                '-point', 'game')[:60]
+                '-point', 'game').filter(point__gte=200)
     template = 'posts/index.html'
     context = {
         'page_obj': total_points_for_players,
@@ -129,7 +129,8 @@ def statistic(request, stat_rule):
         total_goals_for_players = Statistic.objects.all().values(
             'name__id', 'name__name').annotate(
                 game=Sum('game'),
-                goal=Sum('goal')).order_by('-goal', 'game')[:50]
+                goal=Sum('goal')).order_by(
+                    '-goal', 'game').filter(goal__gte=100)
         context = {
             'page_obj': total_goals_for_players,
             'table_name': 'Career Leaders for Goals'
@@ -150,7 +151,8 @@ def statistic(request, stat_rule):
             'name__id',
             'name__name').annotate(
                 game=Sum('game'),
-                assist=Sum('assist')).order_by('-assist', 'game')[:50]
+                assist=Sum('assist')).order_by(
+                    '-assist', 'game').filter(assist__gte=100)
         context = {
             'page_obj': total_assist_for_players,
             'table_name': 'Career Leaders for Assist'

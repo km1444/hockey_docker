@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}
   Профайл пользователя {{ player.name }}
@@ -16,24 +17,28 @@
   </div>
   
   <div class="container col-5">
-    <table class="table table-striped table-bordered table-hover table-sm tcont countLines">
+    <table class="table table-striped table-bordered table-hover table-sm tcont countLines table_sort">
       <thead>
-      <tr>
-        <th>#</th>
-        <th>Name</th>
-        <th>Age</th>
-        <th>Game</th>
-        <th>Goal</th>
-        <th>Assist</th>
-        <th>Point</th>
-        <th>Penalty</th>
-      </tr>
+        <tr>
+          <th>#</th>
+          <th data-type="string">Name</th>
+          <th data-type="number">Age</th>
+          <th data-type="number">Game</th>
+          <th data-type="number">Goal</th>
+          <th data-type="number">Assist</th>
+          <th data-type="number">Point</th>
+          <th data-type="number">Penalty</th>
+        </tr>
       </thead>
-    <tbody>
-    {% for post in page_obj %}
-      {% include 'includes/team_players_in_season_inc.html' %}
-    {% endfor %}
-    </tbody>
-    </table>      
+      <tbody>
+        {% for post in page_obj %}
+          {% include 'includes/team_players_in_season_inc.html' %}
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <script src="/static/css/main.js">
+    </script> 
+
   </div>         
 {% endblock %}
