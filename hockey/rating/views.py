@@ -2,10 +2,13 @@
 from django.contrib.postgres.aggregates.general import StringAgg
 # from django.core.paginator import Paginator
 # from django.db import models
-from django.db.models import Sum
+from django.db.models import Q, Sum
 from django.shortcuts import get_object_or_404, render
+from django.views.generic import ListView
 
-from .models import Player, Statistic, TeamForTable
+from .models import (
+    Player, Playoff, Statistic, TeamForTable, TeamForTable2Round,
+)
 from .secondary import (
     prev_next_season, top_goal, top_point, top_season_goal, top_season_point,
 )
@@ -45,8 +48,7 @@ def team_players_in_season(request, team, season):
 
 def player_detail(request, id):
     player = get_object_or_404(Player, id=id)
-    player_seasons = player.statistics.order_by('season')
-    print(type(player_seasons))
+    player_seasons = player.statistics.order_by('season__name')
     count = player_seasons.values('season').distinct().count()
     game = sum(i.game for i in player_seasons)
     goal = sum(i.goal for i in player_seasons)
@@ -213,6 +215,9 @@ def statistic(request, stat_rule):
 
 def create_table(request, season):
     teams = TeamForTable.objects.filter(season__name=season).order_by('rank')
+    teams2round = TeamForTable2Round.objects.all().filter(
+        season__name=season).order_by('rank')
+    playoff = Playoff.objects.filter(season__name=season).order_by('number')
     query_top_5_1 = Statistic.objects.filter(
         season__name=season).values(
             'name__id',
@@ -246,6 +251,8 @@ def create_table(request, season):
         'previous_season': prev_next_season(season)[1],
         'next_season': prev_next_season(season)[0],
         'page_obj': teams,
+        'teams2round': teams2round,
+        'playoff': playoff,
         'season': season,
         'top_5': query_top_5_1,
         'top_5_goal': top_5_goal,
@@ -332,11 +339,14 @@ def season_leaders(request, team):
 
 
 def history_team(request, team):
+    """ функция формирования содержимого страницы с историей команды """
     team_view = TeamForTable.objects.filter(
-        name__title=team).order_by('-season')
+        name__title=team).select_related(
+            'round_2', 'playoff').order_by('-season__name')
     count_season = team_view.count()
     context = {
         'team_view': team_view,
+        # 'team_view_2round': team_view_2round,
         'team': team,
         'count_season': count_season,
         'top_goal': top_goal(team),
@@ -346,3 +356,15 @@ def history_team(request, team):
     }
     template = 'posts/history_team.html'
     return render(request, template, context)
+
+
+class SearchResultsView(ListView):
+    model = Player
+    template_name = 'search/search_result.html'
+
+    def get_queryset(self):
+        query = self.request.GET.get('q')
+        return Player.objects.filter(
+            Q(name__icontains=query.title()) | Q(
+                year_of_birth__icontains=query)
+        ).order_by('name')
