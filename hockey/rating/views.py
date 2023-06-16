@@ -88,7 +88,7 @@ def best_of_season(request, season, stat_rule):
                 assist=Sum('assist'),
                 point=Sum('point'),
                 penalty=Sum('penalty')).order_by(
-                    f'-{stat_rule}', '-goal', 'game')[:50]
+                    f'-{stat_rule}', '-goal', 'game')[:55]
     template = 'posts/best_of_season.html'
     context = {
         'season': season,
