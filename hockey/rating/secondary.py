@@ -2,6 +2,8 @@ from django.db.models import Sum
 
 from .models import Statistic
 
+"""Топы по командам"""
+
 
 def top_goal(team):
     top = Statistic.objects.filter(

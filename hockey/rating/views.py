@@ -15,6 +15,7 @@ from .secondary import (
 
 
 def index(request):
+    # контекст главной страницы
     total_points_for_players = Statistic.objects.values(
         'name__id', 'name__name').annotate(
             game=Sum('game'), point=Sum('point')).order_by(
@@ -31,16 +32,12 @@ def team_players_in_season(request, team, season):
     team_statistic = Statistic.objects.filter(
         team__title=team, season__name=season
     )
-    next_season = season[:2] + str(
-        int((season)[2:4]) + 1) + season[4:5] + str(int(season[5:]) + 1)
-    previous_season = season[:2] + str(
-        int((season)[2:4]) - 1) + season[4:5] + str(int(season[5:]) - 1)
     template = 'posts/team_players_in_season.html'
     context = {
         'team': team,
         'season': season,
-        'previous_season': previous_season,
-        'next_season': next_season,
+        'previous_season': prev_next_season(season)[1],
+        'next_season': prev_next_season(season)[0],
         'page_obj': team_statistic,
     }
     return render(request, template, context)
