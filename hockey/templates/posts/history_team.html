@@ -36,7 +36,7 @@
       {% for team in team_view %}
       <tr>
         <td><a href="{% url 'rating:create_table' team.season %}">{{ team.season }}</a></td>
-        <td>{{ team.name }}</td>
+        <td><a class="text-decoration-none text-reset" href="{% url 'rating:team_players_in_season' team.name team.season %}">{{ team.name }}</a></td>
         <td>{{ team.games }}</td>
         <td>{{ team.wins }}</td>
         <td>{{ team.ties }}</td>

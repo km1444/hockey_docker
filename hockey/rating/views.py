@@ -1,7 +1,4 @@
-# from aggregates import StringAgg
 from django.contrib.postgres.aggregates.general import StringAgg
-# from django.core.paginator import Paginator
-# from django.db import models
 from django.db.models import Q, Sum
 from django.shortcuts import get_object_or_404, render
 from django.views.generic import ListView
@@ -29,6 +26,7 @@ def index(request):
 
 
 def team_players_in_season(request, team, season):
+    # статистика игроков одной команды за сезон
     team_statistic = Statistic.objects.filter(
         team__title=team, season__name=season
     )
@@ -44,6 +42,8 @@ def team_players_in_season(request, team, season):
 
 
 def player_detail(request, id):
+    """статистика игрока за карьеру, перечень всех сезонов
+    в высшей лиге"""
     player = get_object_or_404(Player, id=id)
     player_seasons = player.statistics.order_by('season__name')
     count = player_seasons.values('season').distinct().count()
@@ -79,6 +79,7 @@ def player_detail(request, id):
 
 
 def best_of_season(request, season, stat_rule):
+    """Общий список игроков за сезон"""
     player_scores = Statistic.objects.filter(
         season__name=season).values(
             'name__id', 'name__name', 'age').annotate(
@@ -101,7 +102,8 @@ def best_of_season(request, season, stat_rule):
 
 
 def all_time_all_player_one_team(request, team):
-    total_points_for_players = Statistic.objects.all().filter(
+    """все игроки выступавшие за одну команду за все время"""
+    total_points_for_players = Statistic.objects.filter(
         team__title=team).values(
             'name__id',
             'name__name').annotate(
@@ -124,6 +126,8 @@ def all_time_all_player_one_team(request, team):
 
 
 def statistic(request, stat_rule):
+    """фнкция позволяющая получить сортированный список игроков
+    по ключевым статистическим показателям"""
     if stat_rule == 'goals_career':
         total_goals_for_players = Statistic.objects.values(
             'name__id', 'name__name').annotate(
@@ -211,38 +215,38 @@ def statistic(request, stat_rule):
 
 
 def create_table(request, season):
+    """функция получения турнирных таблиц и короткого списка лучших
+    игроков для конкретного сезона"""
     teams = TeamForTable.objects.filter(season__name=season).order_by('rank')
     teams2round = TeamForTable2Round.objects.all().filter(
         season__name=season).order_by('rank')
     playoff = Playoff.objects.filter(season__name=season).order_by('number')
-    query_top_5_1 = Statistic.objects.filter(
-        season__name=season).values(
-            'name__id',
-            'name__name',
-            'team__slug').annotate(
-                game=Sum('game'),
-                point=Sum('point')).order_by('-point', 'game')[:5]
-    top_5_goal = Statistic.objects.filter(
-        season__name=season).values(
-            'name__id',
-            'name__name',
-            'team__slug').annotate(
-                game=Sum('game'),
-                goal=Sum('goal')).order_by('-goal', 'game')[:5]
-    top_5_assist = Statistic.objects.filter(
-        season__name=season).values(
-            'name__id',
-            'name__name',
-            'team__slug').annotate(
-                game=Sum('game'),
-                assist=Sum('assist')).order_by('-assist', 'game')[:5]
-    top_5_penalty = Statistic.objects.filter(
-        season__name=season).values(
-            'name__id',
-            'name__name',
-            'team__slug').annotate(
-                game=Sum('game'),
-                penalty=Sum('penalty')).order_by('-penalty', 'game')[:5]
+    top_player = Statistic.objects.filter(
+        season__name=season)
+    top_5_point = top_player.values(
+        'name__id',
+        'name__name',
+        'team__slug').annotate(
+            game=Sum('game'),
+            point=Sum('point')).order_by('-point', 'game')[:6]
+    top_5_goal = top_player.values(
+        'name__id',
+        'name__name',
+        'team__slug').annotate(
+            game=Sum('game'),
+            goal=Sum('goal')).order_by('-goal', 'game')[:5]
+    top_5_assist = top_player.values(
+        'name__id',
+        'name__name',
+        'team__slug').annotate(
+            game=Sum('game'),
+            assist=Sum('assist')).order_by('-assist', 'game')[:5]
+    top_5_penalty = top_player.values(
+        'name__id',
+        'name__name',
+        'team__slug').annotate(
+            game=Sum('game'),
+            penalty=Sum('penalty')).order_by('-penalty', 'game')[:5]
     template = 'table/teams_table.html'
     context = {
         'previous_season': prev_next_season(season)[1],
@@ -251,7 +255,7 @@ def create_table(request, season):
         'teams2round': teams2round,
         'playoff': playoff,
         'season': season,
-        'top_5': query_top_5_1,
+        'top_5': top_5_point,
         'top_5_goal': top_5_goal,
         'top_5_assist': top_5_assist,
         'top_5_penalty': top_5_penalty,
@@ -260,6 +264,8 @@ def create_table(request, season):
 
 
 def leaders_career(request, team):
+    """Десятка лучших по основным показателям за карьеру
+    в команде"""
     query_list = Statistic.objects.filter(
         team__title=team).values(
             'name__id',
@@ -288,6 +294,7 @@ def leaders_career(request, team):
 
 
 def season_leaders(request, team):
+    """10 лучших результатов за сезон в команде"""
     query_list = Statistic.objects.filter(
         team__title=team).values(
             'name__id',
@@ -324,7 +331,6 @@ def history_team(request, team):
     count_season = team_view.count()
     context = {
         'team_view': team_view,
-        # 'team_view_2round': team_view_2round,
         'team': team,
         'count_season': count_season,
         'top_goal': top_goal(team),
@@ -337,6 +343,7 @@ def history_team(request, team):
 
 
 class SearchResultsView(ListView):
+    """поиск, в виде эксперимента через класс"""
     model = Player
     template_name = 'search/search_result.html'
 
