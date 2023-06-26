@@ -228,7 +228,7 @@ def create_table(request, season):
         'name__name',
         'team__slug').annotate(
             game=Sum('game'),
-            point=Sum('point')).order_by('-point', 'game')[:6]
+            point=Sum('point')).order_by('-point', 'goal')[:5]
     top_5_goal = top_player.values(
         'name__id',
         'name__name',
