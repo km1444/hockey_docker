@@ -128,8 +128,8 @@ def all_time_all_player_one_team(request, team):
 def statistic(request, stat_rule):
     """фнкция позволяющая получить сортированный список игроков
     по ключевым статистическим показателям"""
-    a = stat_rule.split('_')
-    if a[1] == 'career':
+    rule = stat_rule.split('_')
+    if rule[1] == 'career':
         total_for_players = Statistic.objects.values(
             'name__id',
             'name__name'
@@ -140,14 +140,14 @@ def statistic(request, stat_rule):
             point=Sum('point'),
             penalty=Sum('penalty')
         ).order_by(
-            f'-{a[0]}',
+            f'-{rule[0]}',
             'game'
         )[:50]
         context = {
             'page_obj': total_for_players,
-            'table_name': 'Career Leaders for' + ' ' + f'{a[0].title()}''s'
+            'table_name': 'Career Leaders for' + ' ' + f'{rule[0].title()}''s'
         }
-    elif a[1] == 'season':
+    elif rule[1] == 'season':
         total_for_players = Statistic.objects.values(
             'name__id',
             'name__name',
@@ -159,13 +159,13 @@ def statistic(request, stat_rule):
             point=Sum('point'),
             penalty=Sum('penalty')
         ).order_by(
-            f'-{a[0]}',
+            f'-{rule[0]}',
             'game'
         )[:50]
         context = {
             'page_obj': total_for_players,
             'table_name':
-            'Single Season Leaders for' + ' ' + f'{a[0].title()}''s'
+            'Single Season Leaders for' + ' ' + f'{rule[0].title()}''s'
         }
     template = 'posts/index.html'
     return render(request, template, context)
