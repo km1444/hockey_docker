@@ -128,87 +128,44 @@ def all_time_all_player_one_team(request, team):
 def statistic(request, stat_rule):
     """фнкция позволяющая получить сортированный список игроков
     по ключевым статистическим показателям"""
-    if stat_rule == 'goals_career':
-        total_goals_for_players = Statistic.objects.values(
-            'name__id', 'name__name').annotate(
-                game=Sum('game'),
-                goal=Sum('goal')).order_by(
-                    '-goal', 'game').filter(goal__gte=100)
+    a = stat_rule.split('_')
+    if a[1] == 'career':
+        total_for_players = Statistic.objects.values(
+            'name__id',
+            'name__name'
+        ).annotate(
+            game=Sum('game'),
+            goal=Sum('goal'),
+            assist=Sum('assist'),
+            point=Sum('point'),
+            penalty=Sum('penalty')
+        ).order_by(
+            f'-{a[0]}',
+            'game'
+        )[:50]
         context = {
-            'page_obj': total_goals_for_players,
-            'table_name': 'Career Leaders for Goals'
+            'page_obj': total_for_players,
+            'table_name': 'Career Leaders for' + ' ' + f'{a[0].title()}''s'
         }
-    elif stat_rule == 'goals_season':
-        total_goals_for_players = Statistic.objects.values(
+    elif a[1] == 'season':
+        total_for_players = Statistic.objects.values(
             'name__id',
             'name__name',
-            'season__name',
-            'game',
-            'goal').order_by('-goal', 'game')[:50]
+            'season__name'
+        ).annotate(
+            game=Sum('game'),
+            goal=Sum('goal'),
+            assist=Sum('assist'),
+            point=Sum('point'),
+            penalty=Sum('penalty')
+        ).order_by(
+            f'-{a[0]}',
+            'game'
+        )[:50]
         context = {
-            'page_obj': total_goals_for_players,
-            'table_name': 'Single Season Leaders for Goals'
-        }
-    elif stat_rule == 'assist_career':
-        total_assist_for_players = Statistic.objects.all().values(
-            'name__id',
-            'name__name').annotate(
-                game=Sum('game'),
-                assist=Sum('assist')).order_by(
-                    '-assist', 'game').filter(assist__gte=100)
-        context = {
-            'page_obj': total_assist_for_players,
-            'table_name': 'Career Leaders for Assist'
-        }
-    elif stat_rule == 'assist_season':
-        total_assist_for_players = Statistic.objects.values(
-            'name__id',
-            'name__name',
-            'season__name',
-            'game',
-            'assist').order_by('-assist', 'game')[:50]
-        context = {
-            'page_obj': total_assist_for_players,
-            'table_name': 'Single Season Leaders for Assist'
-        }
-    elif stat_rule == 'point_season':
-        total_point_for_players = Statistic.objects.values(
-            'name__id',
-            'name__name',
-            'season__name',
-            'game',
-            'point').order_by('-point', 'game')[:50]
-        context = {
-            'page_obj': total_point_for_players,
-            'table_name': 'Single Season Leaders for Points'
-        }
-    elif stat_rule == 'games_career':
-        total_games_for_players = Statistic.objects.values(
-            'name__id',
-            'name__name').annotate(
-                game=Sum('game')).order_by('-game')[:50]
-        context = {
-            'page_obj': total_games_for_players,
-            'table_name': 'Career Leaders for Games'
-        }
-    elif stat_rule == 'penalty_career':
-        total_penalty_for_players = Statistic.objects.values(
-            'name__id', 'name__name').annotate(
-                game=Sum('game'),
-                penalty=Sum('penalty')).order_by('-penalty', 'game')[:50]
-        context = {
-            'page_obj': total_penalty_for_players,
-            'table_name': 'Career Leaders for Penalty'
-        }
-    elif stat_rule == 'penalty_season':
-        total_penalty_for_players = Statistic.objects.values(
-            'name__id',
-            'name__name',
-            'season__name',
-            'game', 'penalty').order_by('-penalty', 'game')[:50]
-        context = {
-            'page_obj': total_penalty_for_players,
-            'table_name': 'Single Season Leaders for Penalty'
+            'page_obj': total_for_players,
+            'table_name':
+            'Single Season Leaders for' + ' ' + f'{a[0].title()}''s'
         }
     template = 'posts/index.html'
     return render(request, template, context)
