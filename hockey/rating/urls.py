@@ -1,5 +1,5 @@
 from django.urls import path
-from rating.views import SearchResultsView
+from rating.views import GoalkeeperStatisticListView, SearchResultsView
 
 from . import views
 
@@ -31,10 +31,35 @@ urlpatterns = [
     ),
     path(
         'team/<str:team>/',
-        views.all_time_all_player_one_team,
+        views. all_time_all_player_one_team,
         name='all_time_all_player_one_team'
     ),
     path('table/<str:season>/', views.create_table, name='create_table'),
     path('history/<str:team>/', views.history_team, name='history_team'),
     path('search/', SearchResultsView.as_view(), name='search_result'),
+    path(
+        'goalkeeper/<int:pk>/',
+        GoalkeeperStatisticListView.as_view(),
+        name='goalkeeper_detail'
+    ),
+    path(
+        'create_statistic/<str:team>/<str:season>',
+        views.add_statistic,
+        name='create_statistic'
+    ),
+    path(
+        'create_player/<str:team>/<str:season>',
+        views.add_player,
+        name='create_player'
+    ),
+    path(
+        'create_goalkeeper_statistic/<str:team>/<str:season>',
+        views.add_goalkeeper_statistic,
+        name='create_goalkeeper_statistic'
+    ),
+    path(
+        'create_player_goalkeeper/<str:team>/<str:season>',
+        views.add_player_goalkeeper,
+        name='create_player_goalkeeper'
+    ),
 ]

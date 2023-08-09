@@ -1,10 +1,15 @@
+from django.contrib.auth.decorators import login_required
 from django.contrib.postgres.aggregates.general import StringAgg
 from django.db.models import Q, Sum
-from django.shortcuts import get_object_or_404, render
+# from django.http import Http404
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import ListView
 
+from .forms import AddGoalkeeperStatisticForm, AddPlayerForm, AddStatisticForm
 from .models import (
-    Player, Playoff, Statistic, TeamForTable, TeamForTable2Round,
+    DescriptionTable, GoalkeeperStatistic, Player, Playoff, Statistic, Team,
+    TeamForTable, TeamForTable2, TeamForTable2Round, TeamForTable2Round2,
+    TeamForTable2Round3, TeamForTable3, TeamForTable4,
 )
 from .secondary import (
     prev_next_season, top_goal, top_point, top_season_goal, top_season_point,
@@ -29,53 +34,106 @@ def team_players_in_season(request, team, season):
     # статистика игроков одной команды за сезон
     team_statistic = Statistic.objects.filter(
         team__title=team, season__name=season
+    ).order_by('-point', '-goal', 'game')
+    goalkeepers = GoalkeeperStatistic.objects.filter(
+        team__title=team, season__name=season
+    ).order_by('-game')
+    team_info = TeamForTable.objects.filter(
+        name__title=team,
+        season__name=season
     )
     template = 'posts/team_players_in_season.html'
     context = {
         'team': team,
+        'team_info': team_info,
         'season': season,
         'previous_season': prev_next_season(season)[1],
         'next_season': prev_next_season(season)[0],
         'page_obj': team_statistic,
+        'goalkeepers': goalkeepers,
     }
     return render(request, template, context)
 
 
 def player_detail(request, id):
-    """статистика игрока за карьеру, перечень всех сезонов
-    в высшей лиге"""
     player = get_object_or_404(Player, id=id)
     player_seasons = player.statistics.order_by('season__name')
-    count = player_seasons.values('season').distinct().count()
-    game = sum(i.game for i in player_seasons)
-    goal = sum(i.goal for i in player_seasons)
-    assist = sum(i.assist for i in player_seasons)
-    point = sum(i.point for i in player_seasons)
-    penalty = sum(i.penalty for i in player_seasons)
-    amount_teams = player_seasons.values('team__title').distinct().count()
-    group_teams = player_seasons.values('team__title').annotate(
-        game=Sum('game'),
-        goal=Sum('goal'),
-        assist=Sum('assist'),
-        point=Sum('point'),
-        penalty=Sum('penalty')
-    ).order_by('-game')
-    position = player_seasons[0].position
-    template = 'posts/profile.html'
-    context = {
-        'player': player,
-        'count': count,
-        'page_obj': player_seasons,
-        'game': game,
-        'goal': goal,
-        'assist': assist,
-        'point': point,
-        'penalty': penalty,
-        'position': position,
-        'group_teams': group_teams,
-        'amount_teams': amount_teams,
-    }
+    if player_seasons:
+        game = sum(i.game for i in player_seasons)
+        goal = sum(i.goal for i in player_seasons)
+        assist = sum(i.assist for i in player_seasons)
+        point = sum(i.point for i in player_seasons)
+        penalty = sum(i.penalty for i in player_seasons)
+        amount_teams = player_seasons.values('team__title').distinct().count()
+        group_teams = player_seasons.values('team__title').annotate(
+            game=Sum('game'),
+            goal=Sum('goal'),
+            assist=Sum('assist'),
+            point=Sum('point'),
+            penalty=Sum('penalty')
+        ).order_by('-game')
+        count = player_seasons.values('season').distinct().count()
+        position = player_seasons[0].position
+        template = 'posts/profile.html'
+        context = {
+            'player': player,
+            'count': count,
+            'page_obj': player_seasons,
+            'game': game,
+            'goal': goal,
+            'assist': assist,
+            'point': point,
+            'penalty': penalty,
+            'position': position,
+            'group_teams': group_teams,
+            'amount_teams': amount_teams,
+        }
+    else:
+        player_seasons = player.goalkeeperstatistic.order_by('season__name')
+        game = sum(i.game for i in player_seasons)
+        goal_against = sum(i.goal_against for i in player_seasons)
+        penalty = sum(i.penalty for i in player_seasons)
+        amount_teams = player_seasons.values('team__title').distinct().count()
+        group_teams = player_seasons.values('team__title').annotate(
+            game=Sum('game'),
+            goal_against=Sum('goal_against'),
+            penalty=Sum('penalty')
+        ).order_by('-game')
+        count = player_seasons.values('season').distinct().count()
+        position = player_seasons[0].position
+        template = 'posts/profile_golie.html'
+        context = {
+            'name': player,
+            'count': count,
+            'page_obj': player_seasons,
+            'game': game,
+            'goal_against': goal_against,
+            'penalty': penalty,
+            'position': position,
+            'group_teams': group_teams,
+            'amount_teams': amount_teams,
+        }
     return render(request, template, context)
+
+
+class GoalkeeperStatisticListView(ListView):
+    model = GoalkeeperStatistic
+    template_name = 'posts/profile_golie.html'
+    context_object_name = 'page_obj'
+
+    def get_queryset(self):
+        return GoalkeeperStatistic.objects.filter(
+            name__id=self.kwargs['pk']).order_by('-season')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['name'] = Player.objects.get(
+            id=self.kwargs['pk'])
+        context['position'] = context['page_obj'][0].position
+        context['count'] = context[
+            'page_obj'].values('season').distinct().count()
+        context['game'] = sum(elem.game for elem in context['page_obj'])
+        return context
 
 
 def best_of_season(request, season, stat_rule):
@@ -103,6 +161,7 @@ def best_of_season(request, season, stat_rule):
 
 def all_time_all_player_one_team(request, team):
     """все игроки выступавшие за одну команду за все время"""
+    team = Team.objects.get(title=team)
     total_points_for_players = Statistic.objects.filter(
         team__title=team).values(
             'name__id',
@@ -175,9 +234,20 @@ def create_table(request, season):
     """функция получения турнирных таблиц и короткого списка лучших
     игроков для конкретного сезона"""
     teams = TeamForTable.objects.filter(season__name=season).order_by('rank')
-    teams2round = TeamForTable2Round.objects.all().filter(
+    teams2 = TeamForTable2.objects.filter(season__name=season).order_by('rank')
+    teams3 = TeamForTable3.objects.filter(season__name=season).order_by('rank')
+    teams4 = TeamForTable4.objects.filter(season__name=season).order_by('rank')
+    teams2round = TeamForTable2Round.objects.filter(
+        season__name=season).order_by('rank')
+    teams2round2 = TeamForTable2Round2.objects.filter(
+        season__name=season).order_by('rank')
+    teams2round3 = TeamForTable2Round3.objects.filter(
         season__name=season).order_by('rank')
     playoff = Playoff.objects.filter(season__name=season).order_by('number')
+    try:
+        description_table = DescriptionTable.objects.get(season__name=season)
+    except DescriptionTable.DoesNotExist:
+        description_table = ''
     top_player = Statistic.objects.filter(
         season__name=season)
     top_5_point = top_player.values(
@@ -209,8 +279,14 @@ def create_table(request, season):
         'previous_season': prev_next_season(season)[1],
         'next_season': prev_next_season(season)[0],
         'page_obj': teams,
+        'teams2': teams2,
+        'teams3': teams3,
+        'teams4': teams4,
         'teams2round': teams2round,
+        'teams2round2': teams2round2,
+        'teams2round3': teams2round3,
         'playoff': playoff,
+        'description_table': description_table,
         'season': season,
         'top_5': top_5_point,
         'top_5_goal': top_5_goal,
@@ -223,6 +299,7 @@ def create_table(request, season):
 def leaders_career(request, team):
     """Десятка лучших по основным показателям за карьеру
     в команде"""
+    team = Team.objects.get(title=team)
     query_list = Statistic.objects.filter(
         team__title=team).values(
             'name__id',
@@ -252,6 +329,7 @@ def leaders_career(request, team):
 
 def season_leaders(request, team):
     """10 лучших результатов за сезон в команде"""
+    team = Team.objects.get(title=team)
     query_list = Statistic.objects.filter(
         team__title=team).values(
             'name__id',
@@ -283,11 +361,12 @@ def season_leaders(request, team):
 def history_team(request, team):
     """ функция формирования содержимого страницы с историей команды """
     team_view = TeamForTable.objects.filter(
-        name__title=team).select_related(
-            'round_2', 'playoff').order_by('-season__name')
+        name__title=team).order_by('-season__name')
+    team = Team.objects.get(title=team)
     count_season = team_view.count()
     context = {
         'team_view': team_view,
+        # 'team_view_2round': team_view_2round,
         'team': team,
         'count_season': count_season,
         'top_goal': top_goal(team),
@@ -310,3 +389,66 @@ class SearchResultsView(ListView):
             Q(name__icontains=query.title()) | Q(
                 year_of_birth__icontains=query)
         ).order_by('name')
+
+
+@login_required
+def add_statistic(request, team, season):
+    """Функция добавления статистической записи об игроке,
+    с автозаполнением полей с названием команды и сезона"""
+    form = AddStatisticForm(team, season, request.POST or None)
+    if form.is_valid():
+        form.save()
+        return redirect('rating:team_players_in_season', team, season)
+    form = AddStatisticForm(team, season)
+    context = {
+        'form': form,
+        'team': team,
+        'season': season
+    }
+    return render(request, 'forms/create_statistic.html', context)
+
+
+@login_required
+def add_player(request, team, season):
+    """Добавление игрока в базу"""
+    form = AddPlayerForm(request.POST or None)
+    if form.is_valid():
+        form.save()
+        return redirect(
+            'rating:create_statistic', team, season)
+    form = AddPlayerForm()
+    return render(request, 'forms/create_player.html', {'form': form})
+
+
+@login_required
+def add_goalkeeper_statistic(request, team, season):
+    """Добавление статистики о голкипере"""
+    form = AddGoalkeeperStatisticForm(team, season, request.POST or None)
+    if form.is_valid():
+        form.save()
+        return redirect('rating:team_players_in_season', team, season)
+    form = AddGoalkeeperStatisticForm(team, season)
+    context = {
+        'form': form,
+        'team': team,
+        'season': season
+    }
+    return render(
+        request,
+        'forms/create_goalkeeper_statistic.html',
+        context
+    )
+
+
+@login_required
+def add_player_goalkeeper(request, team, season):
+    """Добавление игрока в базу со страницы с добавлением статистики по
+    вратарю. Использует туже форму что и полевой игрок, но из-за редиректа
+    другая функция"""
+    form = AddPlayerForm(request.POST or None)
+    if form.is_valid():
+        form.save()
+        return redirect(
+            'rating:create_goalkeeper_statistic', team, season)
+    form = AddPlayerForm()
+    return render(request, 'forms/create_player.html', {'form': form})
