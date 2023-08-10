@@ -10,7 +10,7 @@ SECRET_KEY = 'dr=o^v+7-*f*n&uk_(!gto0#*q%^ucv6&l_qikog&mu-w4ewzo'
 
 DEBUG = True
 
-# ALLOWED_HOSTS = ['158.160.41.209', '127.0.0.1', 'localhost']
+# ALLOWED_HOSTS = ['158.160.41.209', '127.0.0.1', 'localhost', 'hockeyussr.hopto.org']
 ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
