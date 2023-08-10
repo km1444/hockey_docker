@@ -56,6 +56,8 @@ def team_players_in_season(request, team, season):
 
 
 def player_detail(request, id):
+    """if else потому что вратари и полевые игроки из разных таблиц,
+    а система поиска одна"""
     player = get_object_or_404(Player, id=id)
     player_seasons = player.statistics.order_by('season__name')
     if player_seasons:
