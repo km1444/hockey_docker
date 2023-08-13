@@ -35,7 +35,7 @@ urlpatterns = [
         name='all_time_all_player_one_team'
     ),
     path(
-        'goalkeeper/<str:team>/',
+        'goalkeepers/<str:team>/',
         views.goalie_list_team,
         name='goalie_list_team'
     ),
