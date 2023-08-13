@@ -186,6 +186,26 @@ def all_time_all_player_one_team(request, team):
     return render(request, template, context)
 
 
+def goalie_list_team(request, team):
+    team = Team.objects.get(title=team)
+    total_goalkeeper = GoalkeeperStatistic.objects.filter(
+        team__title=team).values(
+            'name__id', 'name__name').annotate(
+                games=Sum('game'),
+                goals=Sum('goal_against'),
+                penalty=Sum('penalty')).order_by('-games')
+    template = 'posts/goalie_list_team.html'
+    context = {
+        'page_obj': total_goalkeeper,
+        'team': team,
+        'top_goal': top_goal(team),
+        'top_point': top_point(team),
+        'top_s_goal': top_season_goal(team),
+        'top_s_point': top_season_point(team),
+    }
+    return render(request, template, context)
+
+
 def statistic(request, stat_rule):
     """фнкция позволяющая получить сортированный список игроков
     по ключевым статистическим показателям"""
