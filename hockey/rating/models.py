@@ -140,9 +140,7 @@ class GoalkeeperStatistic(models.Model):
     team = models.ForeignKey(
         Team,
         on_delete=models.CASCADE,
-        default=8,
-        blank=True,
-        null=True,
+        default=1,
         related_name='goalkeeperstatistic',
         verbose_name="Команда"
     )
@@ -177,9 +175,15 @@ class GoalkeeperStatistic(models.Model):
         super(GoalkeeperStatistic, self).save(*args, **kwargs)
 
     class Meta:
-        verbose_name = "Статистик Вратаря"
+        verbose_name = "Статистика Вратаря"
         verbose_name_plural = "Статистика Вратарей"
-        ordering = ('game',)
+        constraints = [
+            models.UniqueConstraint(
+                name='unique_goalkeeper_statistic',
+                fields=['name', 'team', 'season']
+            )
+        ]
+        ordering = ('-season',)
 
 
 class Playoff(models.Model):
