@@ -39,9 +39,27 @@ def team_players_in_season(request, team, season):
     # статистика игроков одной команды за сезон
     team_statistic = Statistic.objects.filter(
         team__title=team, season__name=season
+    ).values(
+        'id',
+        'name',
+        'name__name',
+        'age',
+        'game',
+        'goal',
+        'assist',
+        'point',
+        'penalty'
     ).order_by('-point', '-goal', 'game')
     goalkeepers = GoalkeeperStatistic.objects.filter(
         team__title=team, season__name=season
+    ).values(
+        'id',
+        'name',
+        'name__name',
+        'age',
+        'game',
+        'goal_against',
+        'penalty'
     ).order_by('-game')
     team_info = TeamForTable.objects.filter(
         name__title=team,
@@ -64,13 +82,25 @@ def player_detail(request, id):
     """if else потому что вратари и полевые игроки из разных таблиц,
     а система поиска одна"""
     player = get_object_or_404(Player, id=id)
-    player_seasons = player.statistics.order_by('season__name')
+    player_seasons = player.statistics.values(
+        'name',
+        'name__name',
+        'age',
+        'team__title',
+        'season__name',
+        'game',
+        'goal',
+        'assist',
+        'point',
+        'penalty',
+        'position__name'
+    ).order_by('season__name')
     if player_seasons:
-        game = sum(i.game for i in player_seasons)
-        goal = sum(i.goal for i in player_seasons)
-        assist = sum(i.assist for i in player_seasons)
-        point = sum(i.point for i in player_seasons)
-        penalty = sum(i.penalty for i in player_seasons)
+        game = sum(i['game'] for i in player_seasons)
+        goal = sum(i['goal'] for i in player_seasons)
+        assist = sum(i['assist'] for i in player_seasons)
+        point = sum(i['point'] for i in player_seasons)
+        penalty = sum(i['penalty'] for i in player_seasons)
         amount_teams = player_seasons.values('team__title').distinct().count()
         group_teams = player_seasons.values('team__title').annotate(
             game=Sum('game'),
@@ -80,7 +110,7 @@ def player_detail(request, id):
             penalty=Sum('penalty')
         ).order_by('-game')
         count = player_seasons.values('season').distinct().count()
-        position = player_seasons[0].position
+        position = player_seasons[0]['position__name']
         template = 'posts/profile.html'
         context = {
             'player': player,
@@ -96,10 +126,19 @@ def player_detail(request, id):
             'amount_teams': amount_teams,
         }
     else:
-        player_seasons = player.goalkeeperstatistic.order_by('season__name')
-        game = sum(i.game for i in player_seasons)
-        goal_against = sum(i.goal_against for i in player_seasons)
-        penalty = sum(i.penalty for i in player_seasons)
+        player_seasons = player.goalkeeperstatistic.values(
+            'name',
+            'name__name',
+            'age',
+            'team__title',
+            'season__name',
+            'game',
+            'goal_against',
+            'penalty'
+        ).order_by('season__name')
+        game = sum(i['game'] for i in player_seasons)
+        goal_against = sum(i['goal_against'] for i in player_seasons)
+        penalty = sum(i['penalty'] for i in player_seasons)
         amount_teams = player_seasons.values('team__title').distinct().count()
         group_teams = player_seasons.values('team__title').annotate(
             game=Sum('game'),
@@ -107,7 +146,7 @@ def player_detail(request, id):
             penalty=Sum('penalty')
         ).order_by('-game')
         count = player_seasons.values('season').distinct().count()
-        position = player_seasons[0].position
+        position = 'Вратарь'
         template = 'posts/profile_golie.html'
         context = {
             'name': player,
@@ -130,16 +169,32 @@ class GoalkeeperStatisticListView(ListView):
 
     def get_queryset(self):
         return GoalkeeperStatistic.objects.filter(
-            name__id=self.kwargs['pk']).order_by('-season')
+            name__id=self.kwargs['pk']
+        ).values(
+            'name',
+            'name__name',
+            'age',
+            'team__title',
+            'season__name',
+            'game',
+            'goal_against',
+            'penalty'
+        ).order_by('-season')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['name'] = Player.objects.get(
             id=self.kwargs['pk'])
-        context['position'] = context['page_obj'][0].position
+        context['position'] = 'Вратарь'
         context['count'] = context[
             'page_obj'].values('season').distinct().count()
-        context['game'] = sum(elem.game for elem in context['page_obj'])
+        context['game'] = sum(elem['game'] for elem in context['page_obj'])
+        context['goal_against'] = sum(
+            elem['goal_against'] for elem in context['page_obj']
+        )
+        context['penalty'] = sum(
+            elem['penalty'] for elem in context['page_obj']
+        )
         return context
 
 
@@ -260,14 +315,20 @@ def statistic(request, stat_rule):
 def create_table(request, season):
     """функция получения турнирных таблиц и короткого списка лучших
     игроков для конкретного сезона"""
-    teams = TeamForTable.objects.filter(season__name=season).order_by('rank')
+    teams = TeamForTable.objects.filter(season__name=season).values(
+        'id', 'rank', 'name__title', 'season__name', 'current_name',
+        'games', 'wins', 'ties', 'losses', 'points').order_by('rank')
     teams2 = TeamForTable2.objects.filter(season__name=season).order_by('rank')
     teams3 = TeamForTable3.objects.filter(season__name=season).order_by('rank')
     teams4 = TeamForTable4.objects.filter(season__name=season).order_by('rank')
     teams2round = TeamForTable2Round.objects.filter(
-        season__name=season).order_by('rank')
+        season__name=season).values(
+        'id', 'rank', 'name__title', 'season__name', 'current_name',
+        'games', 'wins', 'ties', 'losses', 'points').order_by('rank')
     teams2round2 = TeamForTable2Round2.objects.filter(
-        season__name=season).order_by('rank')
+        season__name=season).values(
+        'id', 'rank', 'name__title', 'season__name', 'current_name',
+        'games', 'wins', 'ties', 'losses', 'points').order_by('rank')
     teams2round3 = TeamForTable2Round3.objects.filter(
         season__name=season).order_by('rank')
     playoff = Playoff.objects.filter(season__name=season).order_by('number')

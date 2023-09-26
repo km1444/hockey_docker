@@ -1,13 +1,17 @@
-  <tr>
-    <td>.</td>
-    <td  class="first"><a class="text-decoration-none text-reset" href="{% url 'rating:player_detail' post.name.id %}"> {{ post.name.name }}</a></td>
-    <td>{{ post.age }}</td>
-    <td>{{ post.game }}</td>
-    <td>{{ post.goal }}</td>
-    <td>{{ post.assist }}</td>
-    <td class="table-warning">{{ post.point }}</td>
-    <td>{{ post.penalty }}</td>
-    {% if request.user.is_authenticated %}
+<tr>
+  <td>.</td>
+  <td  class="first">
+    <a class="text-decoration-none text-reset" href="{% url 'rating:player_detail' post.name %}">
+      {{ post.name__name }}
+    </a>
+  </td>
+  <td>{{ post.age }}</td>
+  <td>{{ post.game }}</td>
+  <td>{{ post.goal }}</td>
+  <td>{{ post.assist }}</td>
+  <td class="table-warning">{{ post.point }}</td>
+  <td>{{ post.penalty }}</td>
+  {% if request.user.is_authenticated %}
     <td>
       <p>
         <a href="{% url 'rating:edit_skater_statistic' team season post.id %}">
@@ -18,5 +22,5 @@
         </a>
       </p>
     </td>
-    {% endif %}
-  </tr>
+  {% endif %}
+</tr>
