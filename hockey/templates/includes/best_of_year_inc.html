@@ -3,13 +3,11 @@
     <td class="first"><a class="text-decoration-none text-reset" href="{% url 'rating:player_detail' post.name__id %}"> {{ post.name__name }}</a></td>
     <td>{{ post.age }}</td>
     <td>
+        {% comment %} <a href="{% url 'rating:team_players_in_season' post.team post.season %}"> 
+            {{ post.team }}
+        </a> {% endcomment %}
         {{ post.team }}
     </td>
-    {% comment %} <td>
-        <a href="{% url 'rating:team_players_in_season' post.team post.season %}"> 
-            {{ post.team }}
-        </a>
-    </td> {% endcomment %}
     <td>{{ post.game }}</td>
 
     {% if stat_rule == 'goal' %}
