@@ -1,3 +1,5 @@
+from itertools import chain
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.postgres.aggregates.general import StringAgg
@@ -69,11 +71,16 @@ def team_players_in_season(request, team, season):
         name__title=team,
         season__name=season
     ).values('current_name', 'name__title', 'name__city')
+    team_info_3 = TeamForTable3.objects.filter(
+        name__title=team,
+        season__name=season
+    ).values('current_name', 'name__title', 'name__city')
     template = 'posts/team_players_in_season.html'
     context = {
         'team': team,
         'team_info': team_info,
         'team_info_2': team_info_2,
+        'team_info_3': team_info_3,
         'season': season,
         'previous_season': prev_next_season(season)[1],
         'next_season': prev_next_season(season)[0],
@@ -326,8 +333,12 @@ def create_table(request, season):
     teams2 = TeamForTable2.objects.filter(season__name=season).values(
         'id', 'rank', 'name__title', 'season__name', 'current_name',
         'games', 'wins', 'ties', 'losses', 'points').order_by('rank')
-    teams3 = TeamForTable3.objects.filter(season__name=season).order_by('rank')
-    teams4 = TeamForTable4.objects.filter(season__name=season).order_by('rank')
+    teams3 = TeamForTable3.objects.filter(season__name=season).values(
+        'id', 'rank', 'name__title', 'season__name', 'current_name',
+        'games', 'wins', 'ties', 'losses', 'points').order_by('rank')
+    teams4 = TeamForTable4.objects.filter(season__name=season).values(
+        'id', 'rank', 'name__title', 'season__name', 'current_name',
+        'games', 'wins', 'ties', 'losses', 'points').order_by('rank')
     teams2round = TeamForTable2Round.objects.filter(
         season__name=season).values(
         'id', 'rank', 'name__title', 'season__name', 'current_name',
@@ -340,7 +351,10 @@ def create_table(request, season):
         season__name=season).values(
         'id', 'rank', 'name__title', 'season__name', 'current_name',
         'games', 'wins', 'ties', 'losses', 'points').order_by('rank')
-    playoff = Playoff.objects.filter(season__name=season).order_by('number')
+    playoff = Playoff.objects.filter(season__name=season).values(
+        'id', 'study', 'result_serie', 'team_1__title', 'team_2__title',
+        'season__name', 'current_name_team_1', 'current_name_team_2'
+    ).order_by('number')
     try:
         description_table = DescriptionTable.objects.get(season__name=season)
     except DescriptionTable.DoesNotExist:
@@ -474,11 +488,18 @@ def history_team(request, team):
     team_view_2 = TeamForTable2.objects.filter(
         name__title=team).select_related(
             'season', 'round_2').order_by('-season__name')
+    team_view_3 = TeamForTable3.objects.filter(
+        name__title=team).select_related(
+            'season', 'round_2').order_by('-season__name')
+    team_view_general = sorted(
+        chain(team_view, team_view_2, team_view_3),
+        key=lambda x: x.season.name, reverse=True)
     team = Team.objects.get(title=team)
-    count_season = team_view.count()
+    count_season = (
+        team_view.count() + team_view_2.count() + team_view_3.count()
+    )
     context = {
-        'team_view': team_view,
-        'team_view_2': team_view_2,
+        'team_view_general': team_view_general,
         'team': team,
         'count_season': count_season,
         'top_goal': top_goal(team),
