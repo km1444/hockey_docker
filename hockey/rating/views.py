@@ -506,7 +506,9 @@ def history_team(request, team):
         key=lambda x: x.season.name, reverse=True)
     team = Team.objects.get(title=team)
     count_season = (
-        team_view.count() + team_view_2.count() + team_view_3.count()
+        (
+            team_view.count() + team_view_2.count()
+        ) + team_view_3.count() + team_view_4.count()
     )
     context = {
         'team_view_general': team_view_general,
