@@ -197,7 +197,7 @@ class GoalkeeperStatisticListView(ListView):
             'game',
             'goal_against',
             'penalty'
-        ).order_by('-season')
+        ).order_by('season__name')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
