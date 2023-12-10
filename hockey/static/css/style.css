@@ -279,3 +279,11 @@ th.sorted[data-order="-1"]::after {
 th.sorted[data-order="1"]::after {
     content: "▲"
 }
+
+.season_grid {
+    display: grid;
+	grid-template-columns: repeat(3, auto);
+    grid-gap: 3px 15px;
+    justify-content: left;
+    margin-bottom: 5px;
+}

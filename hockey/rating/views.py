@@ -27,12 +27,13 @@ def index(request):
     # контекст главной страницы
     total_points_for_players = Statistic.objects.values(
         'name__id', 'name__name').annotate(
-            game=Sum('game'), point=Sum('point')).order_by(
-                '-point', 'game').filter(point__gte=200)
+            game=Sum('game'),
+            goal=Sum('goal')).order_by(
+                '-goal', 'game').filter(goal__gte=100)
     template = 'posts/index.html'
     context = {
         'page_obj': total_points_for_players,
-        'table_name': 'Career Leaders for Points',
+        'table_name': 'Career Leaders for Goals',
         'title': 'Лучшие бомбардиры советского хоккея'
     }
     return render(request, template, context)
