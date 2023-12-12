@@ -1,4 +1,5 @@
 from django.urls import path
+from django.views.generic.base import TemplateView
 from rating.views import (
     GoalkeeperStatisticListView, SearchResultsView, SkaterStatisticDeleteView,
     SkaterStatisticUpdateView,
@@ -89,5 +90,12 @@ urlpatterns = [
         'delete_goalkeeper_statistic/<str:team>/<str:season>/<int:id>',
         views.delete_goalkeeper_statistic,
         name='delete_goalkeeper_statistic'
+    ),
+    path(
+        'robots.txt/',
+        TemplateView.as_view(
+            template_name='posts/robots.txt',
+            content_type='text/plain'
+        ),
     ),
 ]
