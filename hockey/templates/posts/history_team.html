@@ -1,5 +1,10 @@
 {% extends 'base.html' %}
 {% load static %}
+
+{% block description %}
+  <meta name="description" content="Все сезоны {{ team }} {{ team.city }} в высшем эшелоне советского хоккея">
+{% endblock %}
+
 {% block title %}
 {{ team }} Хоккейный клуб СССР    
 {% endblock %}
