@@ -14,8 +14,8 @@ from .forms import (
     EditGoalkeeperStatisticForm, EditStatisticForm,
 )
 from .models import (
-    DescriptionTable, GoalkeeperStatistic, Player, Playoff, Statistic, Team,
-    TeamForTable, TeamForTable2, TeamForTable2Round, TeamForTable2Round2,
+    DescriptionTable, GoalkeeperStatistic, Player, Playoff, Season, Statistic,
+    Team, TeamForTable, TeamForTable2, TeamForTable2Round, TeamForTable2Round2,
     TeamForTable2Round3, TeamForTable3, TeamForTable4,
 )
 from .secondary import (
@@ -40,9 +40,10 @@ def index(request):
 
 
 def team_players_in_season(request, team, season):
-    # статистика игроков одной команды за сезон
+    team = get_object_or_404(Team, title=team)
+    season = get_object_or_404(Season, name=season)
     team_statistic = Statistic.objects.filter(
-        team__title=team, season__name=season
+        team__title=team.title, season__name=season.name
     ).values(
         'id',
         'name',
@@ -55,7 +56,7 @@ def team_players_in_season(request, team, season):
         'penalty'
     ).order_by('-point', '-goal', 'game')
     goalkeepers = GoalkeeperStatistic.objects.filter(
-        team__title=team, season__name=season
+        team__title=team.title, season__name=season.name
     ).values(
         'id',
         'name',
@@ -66,20 +67,20 @@ def team_players_in_season(request, team, season):
         'penalty'
     ).order_by('-game')
     team_info = TeamForTable.objects.filter(
-        name__title=team,
-        season__name=season
+        name__title=team.title,
+        season__name=season.name
     ).values('current_name', 'name__title', 'name__city')
     team_info_2 = TeamForTable2.objects.filter(
-        name__title=team,
-        season__name=season
+        name__title=team.title,
+        season__name=season.name
     ).values('current_name', 'name__title', 'name__city')
     team_info_3 = TeamForTable3.objects.filter(
-        name__title=team,
-        season__name=season
+        name__title=team.title,
+        season__name=season.name
     ).values('current_name', 'name__title', 'name__city')
     team_info_4 = TeamForTable4.objects.filter(
-        name__title=team,
-        season__name=season
+        name__title=team.title,
+        season__name=season.name
     ).values('current_name', 'name__title', 'name__city')
     template = 'posts/team_players_in_season.html'
     context = {
@@ -89,8 +90,8 @@ def team_players_in_season(request, team, season):
         'team_info_3': team_info_3,
         'team_info_4': team_info_4,
         'season': season,
-        'previous_season': prev_next_season(season)[1],
-        'next_season': prev_next_season(season)[0],
+        'previous_season': prev_next_season(season.name)[1],
+        'next_season': prev_next_season(season.name)[0],
         'page_obj': team_statistic,
         'goalkeepers': goalkeepers,
     }
@@ -242,7 +243,7 @@ def best_of_season(request, season, stat_rule):
 
 def all_time_all_player_one_team(request, team):
     """все игроки выступавшие за одну команду за все время"""
-    team = Team.objects.get(title=team)
+    team = get_object_or_404(Team, title=team)
     total_points_for_players = Statistic.objects.filter(
         team__title=team).values(
             'name__id',
@@ -266,7 +267,7 @@ def all_time_all_player_one_team(request, team):
 
 
 def goalie_list_team(request, team):
-    team = Team.objects.get(title=team)
+    team = get_object_or_404(Team, title=team)
     total_goalkeeper = GoalkeeperStatistic.objects.filter(
         team__title=team).values(
             'name__id', 'name__name').annotate(
@@ -418,7 +419,7 @@ def create_table(request, season):
 def leaders_career(request, team):
     """Десятка лучших по основным показателям за карьеру
     в команде"""
-    team = Team.objects.get(title=team)
+    team = get_object_or_404(Team, title=team)
     query_list = Statistic.objects.filter(
         team__title=team).values(
             'name__id',
@@ -459,7 +460,7 @@ def leaders_career(request, team):
 
 def season_leaders(request, team):
     """10 лучших результатов за сезон в команде"""
-    team = Team.objects.get(title=team)
+    team = get_object_or_404(Team, title=team)
     query_list = Statistic.objects.filter(
         team__title=team).values(
             'name__id',
@@ -505,7 +506,7 @@ def history_team(request, team):
     team_view_general = sorted(
         chain(team_view, team_view_2, team_view_3, team_view_4),
         key=lambda x: x.season.name, reverse=True)
-    team = Team.objects.get(title=team)
+    team = get_object_or_404(Team, title=team)
     count_season = (
         (
             team_view.count() + team_view_2.count()

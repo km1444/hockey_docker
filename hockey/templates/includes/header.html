@@ -58,10 +58,10 @@
               Teams
             </a>
               <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                {% for team in all_team %}
+                {% for name, city in all_team.items %}
                 <li>
-                  <a class="dropdown-item" href="{% url 'rating:history_team' team.title %}">
-                    {{ team.title }} - {{ team.city }}
+                  <a class="dropdown-item" href="{% url 'rating:history_team' name %}">
+                    {{ name }} - {{ city }}
                   </a>
                 </li>
                 {% endfor %}
