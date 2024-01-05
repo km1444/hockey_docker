@@ -57,15 +57,17 @@
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               Teams
             </a>
-              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <div class="team_grid">
                 {% for name, city in all_team.items %}
-                <li>
-                  <a class="dropdown-item" href="{% url 'rating:history_team' name %}">
-                    {{ name }} - {{ city }}
-                  </a>
-                </li>
+                  <li>
+                    <a class="dropdown-item" href="{% url 'rating:history_team' name %}">
+                      {{ name }} - {{ city }}
+                    </a>
+                  </li>
                 {% endfor %}
-              </ul>
+              </div>
+            </ul>
           </li>
         </div>
         <div class="dropdown">
