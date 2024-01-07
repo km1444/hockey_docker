@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
 
+{% block description %}
+  <meta name="description" content="Советский хоккей. Команда {{ team }} сезон {{ season }}">
+{% endblock %}
+
 {% block title %}
 {{ team }} {{ season }}
 {% endblock %}
