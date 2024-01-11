@@ -39,7 +39,7 @@ def index(request):
     context = {
         'page_obj': page_obj,
         'start_index': start_index,
-        'table_name': 'Career Leaders for Goals',
+        'table_name': 'Most Goals Career',
         'title': 'Лучшие бомбардиры советского хоккея'
     }
     return render(request, template, context)
@@ -325,7 +325,7 @@ def statistic(request, stat_rule):
         context = {
             'page_obj': page_obj,
             'start_index': start_index,
-            'table_name': 'Career Leaders for' + ' ' + f'{rule[0].title()}''s'
+            'table_name': 'Most ' + f'{rule[0].title()}''s' + ' Career',
         }
     elif rule[1] == 'season':
         total_for_players = Statistic.objects.values(
@@ -350,7 +350,7 @@ def statistic(request, stat_rule):
             'page_obj': page_obj,
             'start_index': start_index,
             'table_name':
-            'Single Season Leaders for' + ' ' + f'{rule[0].title()}''s'
+            'Most ' + f'{rule[0].title()}''s' + ' Season'
         }
     template = 'posts/index.html'
     return render(request, template, context)
