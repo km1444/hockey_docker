@@ -147,3 +147,9 @@ INTERNAL_IPS = [
 
 LOGIN_URL = 'users:login'
 LOGIN_REDIRECT_URL = 'rating:index'
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    }
+}
