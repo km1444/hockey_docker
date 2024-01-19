@@ -295,7 +295,7 @@ def goalie_list_team(request, team):
         'top_point': top_point(team),
         'top_s_goal': top_season_goal(team),
         'top_s_point': top_season_point(team),
-        'title': 'Вратари каманды'
+        'title': 'Вратари команды'
     }
     return render(request, template, context)
 

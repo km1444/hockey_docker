@@ -1,8 +1,12 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block description %}
+  <meta name="description" content="Вратари голкиперы {{ team }} {{ team.city }} в высшем эшелоне советского хоккея">
+{% endblock %}
+
 {% block title %}    
-{{ title }} {{ team }}
+ {{ title }} {{ team }}
 {% endblock %}
 
 {% block content %}
