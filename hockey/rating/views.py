@@ -1,10 +1,13 @@
+import operator
+
+from functools import reduce
 from itertools import chain
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.postgres.aggregates.general import StringAgg
 from django.core.paginator import Paginator
-from django.db.models import Q, Sum
+from django.db.models import Max, Q, Sum
 # from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.views.generic import ListView
@@ -350,7 +353,30 @@ def statistic(request, stat_rule):
             'page_obj': page_obj,
             'start_index': start_index,
             'table_name':
-            'Most ' + f'{rule[0].title()}''s' + ' Season'
+            'Most ' + f'{rule[0].title()}''s' + ' Single Season'
+        }
+    elif rule[1] == 'yearly':
+        best_goals = Statistic.objects.values(
+            'season__name'
+        ).annotate(
+            goal=Max('goal'))
+        q_object = reduce(operator.or_, (Q(**x) for x in best_goals))
+        queryset = Statistic.objects.values(
+            'name__id',
+            'name__name',
+            'season__name',
+            'goal',
+            'game'
+        ).filter(q_object).order_by('season__name')
+        paginator = Paginator(queryset, 25)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+        start_index = page_obj.start_index() - 1
+        context = {
+            'page_obj': page_obj,
+            'start_index': start_index,
+            'table_name':
+            'Yearly Leaders for ' + f'{rule[0].title()}''s'
         }
     template = 'posts/index.html'
     return render(request, template, context)
