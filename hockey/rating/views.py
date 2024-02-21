@@ -304,7 +304,7 @@ def goalie_list_team(request, team):
 
 
 def statistic(request, stat_rule):
-    """фнкция позволяющая получить сортированный список игроков
+    """фнкция позволяющая получит сортированный список игроков
     по ключевым статистическим показателям"""
     rule = stat_rule.split('_')
     if rule[1] == 'career':
