@@ -10,6 +10,7 @@
 {% endblock title %}
 
 {% block content %}
+
   <div class="container col-sm-5 py-1">
     <h1>{{ player.name }}</h1>
     <h4>Position : {{ position }}</h4>
@@ -18,73 +19,108 @@
       <img src="{% static 'img/wiki.png' %}" >
     </a>
   </div>
-    <div class="container col-sm-5 p-1 my-1">
-      <table class="table table-bordered table-hover table-sm">
-        <thead>
-          <tr>
-            <th>Season</th>
-            <th>Age</th>
-            <th>Tm</th>
-            <th>GP</th>
-            <th>G</th>
-            <th>A</th>
-            <th>PTS</th>
-            <th>PIM</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for post in page_obj %}
-          <tr>
-            <td>
-                <a href="{% url 'rating:create_table' post.season__name %}">
-                    {{ post.season__name }}
-                </a>
-            </td>
-            <td>{{ post.age }}</td>
-            <td>
-                <a href="{% url 'rating:team_players_in_season' post.team__title post.season__name %}"> 
-                    {{ post.team__title }}
-                </a>
-            </td>
-            <td>{{ post.game }}</td>
-            <td>{{ post.goal }}</td>
-            <td>{{ post.assist }}</td>
-            <td class="table-warning">{{ post.point }}</td>
-            <td>{{ post.penalty }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-        <tfoot>
+
+  <div class="container col-sm-5 p-1 my-1">
+    <table class="table table-bordered table-hover table-sm">
+      <thead>
         <tr>
-          <th>{{ count }} s</th>
-          <th></th>
-          <th></th>
-          <th>{{ game }}</th>
-          <th>{{ goal }}</th>
-          <th>{{ assist }}</th>
-          <th>{{ point }}</th>
-          <th>{{ penalty }}</th>
+          <th>Season</th>
+          <th>Age</th>
+          <th>Tm</th>
+          <th>GP</th>
+          <th>G</th>
+          <th>A</th>
+          <th>PTS</th>
+          <th>PIM</th>
         </tr>
-        {% if amount_teams != 1 %}
-          {% for elem in group_teams %}
+      </thead>
+      <tbody>
+        {% for post in page_obj %}
+        <tr>
+          <td>
+              <a href="{% url 'rating:create_table' post.season__name %}">
+                  {{ post.season__name }}
+              </a>
+          </td>
+          <td>{{ post.age }}</td>
+          <td>
+              <a href="{% url 'rating:team_players_in_season' post.team__title post.season__name %}"> 
+                  {{ post.team__title }}
+              </a>
+          </td>
+          <td>{{ post.game }}</td>
+          <td>{{ post.goal }}</td>
+          <td>{{ post.assist }}</td>
+          <td class="table-warning">{{ post.point }}</td>
+          <td>{{ post.penalty }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+      <tr>
+        <th>{{ count }} s</th>
+        <th></th>
+        <th></th>
+        <th>{{ game }}</th>
+        <th>{{ goal }}</th>
+        <th>{{ assist }}</th>
+        <th>{{ point }}</th>
+        <th>{{ penalty }}</th>
+      </tr>
+      {% if amount_teams != 1 %}
+        {% for elem in group_teams %}
+        <tr>
+          <td></td>
+          <td></td>
+          <td>
+              <a href="{% url 'rating:all_time_all_player_one_team' elem.team__title %}"> 
+                  {{ elem.team__title }}
+              </a>
+          </td>
+          <td>{{ elem.game }}</td>
+          <td>{{ elem.goal }}</td>
+          <td>{{ elem.assist }}</td>
+          <td>{{ elem.point }}</td>
+          <td>{{ elem.penalty }}</td>
+        </tr>
+        {% endfor %}
+      {% endif %}
+      </tfoot>
+    </table>
+  </div>
+  
+  {% if coach %}
+  <div class="container col-sm-5 p-1 my-1">
+    <h4>Coaching Record</h4>
+    <table class="table table-bordered table-hover table-sm">
+      <thead>
+        <tr>
+          <th>Season</th>
+          <th>Age</th>
+          <th>Tm</th>
+          <th>Pos</th>
+          <th>Comment</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for coach_rec in coach_obj %}
           <tr>
-            <td></td>
-            <td></td>
-            <td>
-                <a href="{% url 'rating:all_time_all_player_one_team' elem.team__title %}"> 
-                    {{ elem.team__title }}
-                </a>
-            </td>
-            <td>{{ elem.game }}</td>
-            <td>{{ elem.goal }}</td>
-            <td>{{ elem.assist }}</td>
-            <td>{{ elem.point }}</td>
-            <td>{{ elem.penalty }}</td>
+            <td>{{ coach_rec.season__name }}</td>
+            <td>{{ coach_rec.age }}</td>
+            <td>{{ coach_rec.team__title }}</td>
+            <td>{{ coach_rec.final_position }}</td>
+            {% if coach_rec.full_season %}
+              <td></td>
+            {% elif coach_rec.fired_season %}
+              <td>Ушел по ходу сезона</td>
+            {% elif coach_rec.came_season %}
+              <td>Пришел по ходу сезона</td>
+            {% endif %}
           </tr>
-          {% endfor %}
-        {% endif %}
-        </tfoot>
-      </table>
-    </div>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
   
 {% endblock content %}

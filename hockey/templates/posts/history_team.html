@@ -48,10 +48,12 @@
             <td><b>{{ team.points }}</b></td>
             <td>{{ team.points_percentage }}</td>
             <td>{{ team.rank }}</td>
-            {% if team.coach_2 %}
+            {% if not team.coach_1 %}
+              <td></td>
+            {% elif team.coach_2 %}
               <td title="{{ team.coach_1.name}}, {{team.coach_2.name }}"> 2 тренера </td>
             {% else %}
-              <td> {{ team.coach_1.name }} </a></td>
+              <td><a href="{% url 'rating:player_detail' team.coach_1_id %}">{{ team.coach_1.name }} </a></td>
             {% endif %}
           </tr>
           {% if team.round_2 %}
