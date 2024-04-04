@@ -9,7 +9,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.postgres.aggregates.general import StringAgg
 from django.core.paginator import Paginator
 from django.db.models import Max, Q, Sum
-# from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.views.generic import ListView
 from django.views.generic.edit import DeleteView, UpdateView
@@ -80,8 +79,8 @@ def team_players_in_season(request, team, season):
         team__title=team.title, season__name=season.name
     ).values(
         'id',
-        'name',
-        'name__name'
+        'coach_name',
+        'coach_name__name'
     )
     team_info = TeamForTable.objects.filter(
         name__title=team.title,
@@ -143,8 +142,8 @@ def player_detail(request, id):
         'penalty'
     ).order_by('season__name')
     coach_stat = player.coachstatistic.values(
-        'name',
-        'name__name',
+        'coach_name',
+        'coach_name__name',
         'age',
         'team__title',
         'season__name',
@@ -537,24 +536,32 @@ def history_team(request, team):
             'round_2',
             'playoff',
             'coach_1',
-            'coach_2').order_by('-season__name')
+            'coach_2',
+            'coach_3').order_by('-season__name')
     team_view_2 = TeamForTable2.objects.filter(
         name__title=team).select_related(
-            'season', 'round_2', 'coach_1').order_by('-season__name')
+            'season', 'round_2', 'coach_1',
+            'coach_2',
+            'coach_3').order_by('-season__name')
     team_view_3 = TeamForTable3.objects.filter(
         name__title=team).select_related(
-            'season', 'round_2', 'coach_1').order_by('-season__name')
+            'season', 'round_2', 'coach_1',
+            'coach_2',
+            'coach_3').order_by('-season__name')
     team_view_4 = TeamForTable4.objects.filter(
         name__title=team).select_related(
-            'season', 'round_2', 'coach_1').order_by('-season__name')
+            'season', 'round_2', 'coach_1',
+            'coach_2',
+            'coach_3').order_by('-season__name')
     team_view_general = sorted(
         chain(team_view, team_view_2, team_view_3, team_view_4),
-        key=lambda x: x.season.name, reverse=True)
+        key=lambda x: x.season.name, reverse=True
+    )
     team = get_object_or_404(Team, title=team)
     count_season = (
         (
             team_view.count() + team_view_2.count()
-        ) + team_view_3.count() + team_view_4.count()
+        ) + (team_view_3.count() + team_view_4.count())
     )
     context = {
         'team_view_general': team_view_general,
@@ -563,7 +570,7 @@ def history_team(request, team):
         'top_goal': top_goal(team),
         'top_point': top_point(team),
         'top_s_goal': top_season_goal(team),
-        'top_s_point': top_season_point(team)
+        'top_s_point': top_season_point(team),
     }
     template = 'posts/history_team.html'
     return render(request, template, context)
