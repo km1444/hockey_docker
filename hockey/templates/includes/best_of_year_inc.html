@@ -6,7 +6,7 @@
         {% comment %} <a href="{% url 'rating:team_players_in_season' post.team post.season %}"> 
             {{ post.team }}
         </a> {% endcomment %}
-        {{ post.team }}
+        {{ post.team__slug }}
     </td>
     <td>{{ post.game }}</td>
 

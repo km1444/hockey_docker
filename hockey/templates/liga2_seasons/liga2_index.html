@@ -1,0 +1,70 @@
+{% extends 'liga_2_base.html' %}
+{% load static %}
+
+{% block description %}
+  <meta name="description" content="{{ title }}">
+{% endblock %}
+
+{% block title %}
+  {{ title }}
+{% endblock %}
+
+{% block content %}
+<div class="container col-sm-4 p-1 my-1">
+  <h4 align="center"> {{ table_name }} </h4>
+</div>
+
+<div class="container col-sm-4 p-1 my-1">
+  <table class="table table-striped table-bordered table-hover table-sm">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Player</th>
+        <th>GP</th>
+          {% if table_name == 'Most Points Career League 1' or table_name == 'Most Points Single Season League 1' %}
+            <th>PTS</th>
+            {% elif table_name == 'Most Goals Career League 1' or table_name == 'Most Goals Single Season League 1' or table_name == 'Yearly Leaders for Goals League 1' %}
+            <th>G</th>
+            {% elif table_name == 'Most Assists Career League 1' or table_name == 'Most Assists Single Season League 1' %}
+            <th>A</th>
+            {% elif table_name == 'Most Penaltys Career League 1' or table_name == 'Most Penaltys Single Season League 1' %}
+            <th>PIM</th>
+          {% endif %}
+
+          {% if table_name == 'Most Points Single Season League 1' or table_name == 'Most Goals Single Season League 1' or table_name == 'Most Assists Single Season League 1' or table_name == 'Most Penaltys Single Season League 1' or table_name == 'Yearly Leaders for Goals League 1' %}
+            <th>Season</th>
+          {% endif %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for post in page_obj %}
+      <tr>
+        <td>{{ start_index | add:forloop.counter }}.</td>
+        <td class="first">
+          <a class="text-decoration-none text-reset" href="{% url 'rating:player_detail' post.name__id %}">
+            {{ post.name__name }}
+          </a>
+        <td>{{ post.game }}</td>
+      
+        {% if table_name == 'Most Points Career League 1' or table_name == 'Most Points Single Season League 1' %}
+          <td>{{ post.point }}</td>
+        {% elif table_name == 'Most Goals Career League 1' or table_name == 'Most Goals Single Season League 1' or table_name == 'Yearly Leaders for Goals League 1' %}
+          <td>{{ post.goal }}</td>
+        {% elif table_name == 'Most Assists Career League 1' or table_name == 'Most Assists Single Season League 1' %}
+          <td>{{ post.assist }}</td>
+        {% elif table_name == 'Most Penaltys Career League 1' or table_name == 'Most Penaltys Single Season League 1' %}
+          <td>{{ post.penalty }}</td>
+        {% endif %}
+           
+        {% if table_name == 'Most Points Single Season League 1' or table_name == 'Most Goals Single Season League 1' or table_name == 'Most Assists Single Season League 1' or table_name == 'Most Penaltys Single Season League 1' or table_name == 'Yearly Leaders for Goals League 1' %}
+          <td>{{ post.season__name }}</td>
+        {% endif %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% include 'posts/includes/paginator.html' %}
+</div>
+
+{% endblock %}
+  

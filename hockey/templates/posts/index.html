@@ -10,7 +10,6 @@
 {% endblock %}
 
 {% block content %}
-
 <div class="container col-sm-4 p-1 my-1">
   <h4 align="center"> {{ table_name }} </h4>
 </div>
@@ -22,19 +21,19 @@
         <th>#</th>
         <th>Player</th>
         <th>GP</th>
-        {% if table_name == 'Most Points Career' or table_name == 'Most Points Single Season' %}
-        <th>PTS</th>
-        {% elif table_name == 'Most Goals Career' or table_name == 'Most Goals Single Season' or table_name == 'Yearly Leaders for Goals' %}
-        <th>G</th>
-        {% elif table_name == 'Most Assists Career' or table_name == 'Most Assists Single Season' %}
-        <th>A</th>
-        {% elif table_name == 'Most Penaltys Career' or table_name == 'Most Penaltys Single Season' %}
-        <th>PIM</th>
-      {% endif %}
+          {% if table_name == 'Most Points Career' or table_name == 'Most Points Single Season' %}
+            <th>PTS</th>
+            {% elif table_name == 'Most Goals Career' or table_name == 'Most Goals Single Season' or table_name == 'Yearly Leaders for Goals' %}
+            <th>G</th>
+            {% elif table_name == 'Most Assists Career' or table_name == 'Most Assists Single Season' %}
+            <th>A</th>
+            {% elif table_name == 'Most Penaltys Career' or table_name == 'Most Penaltys Single Season' %}
+            <th>PIM</th>
+          {% endif %}
 
-      {% if table_name == 'Most Points Single Season' or table_name == 'Most Goals Single Season' or table_name == 'Most Assists Single Season' or table_name == 'Most Penaltys Single Season' or table_name == 'Yearly Leaders for Goals' %}
-        <td>Season</td>
-      {% endif %}
+          {% if table_name == 'Most Points Single Season' or table_name == 'Most Goals Single Season' or table_name == 'Most Assists Single Season' or table_name == 'Most Penaltys Single Season' or table_name == 'Yearly Leaders for Goals' %}
+            <th>Season</th>
+          {% endif %}
       </tr>
     </thead>
     <tbody>

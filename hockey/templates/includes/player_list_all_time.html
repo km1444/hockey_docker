@@ -7,18 +7,31 @@
   <td>{{ post.game }}</td>
   
 
-{% if table_name == 'Most Points Career' or table_name == 'Most Points Single Season' %}
-  <td>{{ post.point }}</td>
-{% elif table_name == 'Most Goals Career' or table_name == 'Most Goals Single Season' or table_name == 'Yearly Leaders for Goals' %}
-  <td>{{ post.goal }}</td>
-{% elif table_name == 'Most Assists Career' or table_name == 'Most Assists Single Season' %}
-  <td>{{ post.assist }}</td>
-{% elif table_name == 'Most Penaltys Career' or table_name == 'Most Penaltys Single Season' %}
-  <td>{{ post.penalty }}</td>
-{% endif %}
+    {% comment %} {% if table_name == 'Career Leaders for Points' or table_name == 'Single Season Leaders for Points' %}
+      <td>{{ post.point }}</td>
+    {% elif table_name == 'Career Leaders for Goals' or table_name == 'Single Season Leaders for Goals' %}
+      <td>{{ post.goal }}</td>
+    {% elif table_name == 'Career Leaders for Assists' or table_name == 'Single Season Leaders for Assists' %}
+      <td>{{ post.assist }}</td>
+    {% elif table_name == 'Career Leaders for Penaltys' or table_name == 'Single Season Leaders for Penaltys' %}
+      <td>{{ post.penalty }}</td>
+  {% endif %} {% endcomment %}
 
-{% if table_name == 'Most Points Single Season' or table_name == 'Most Goals Single Season' or table_name == 'Most Assists Single Season' or table_name == 'Most Penaltys Single Season' or table_name == 'Yearly Leaders for Goals' %}
+  {% if table_name == 'Most Points Career' or table_name == 'Most Points Single Season' %}
+    <td>{{ post.point }}</td>
+  {% elif table_name == 'Most Goals Career' or table_name == 'Most Goals Single Season' or table_name == 'Yearly Leaders for Goals' %}
+    <td>{{ post.goal }}</td>
+  {% elif table_name == 'Most Assists Career' or table_name == 'Most Assists Single Season' %}
+    <td>{{ post.assist }}</td>
+  {% elif table_name == 'Most Penaltys Career' or table_name == 'Most Penaltys Single Season' %}
+    <td>{{ post.penalty }}</td>
+  {% endif %}
+
+  {% comment %} {% if table_name == 'Single Season Leaders for Points' or table_name == 'Single Season Leaders for Goals' or table_name == 'Single Season Leaders for Assists' or table_name == 'Single Season Leaders for Penaltys' %}
     <td>{{ post.season__name }}</td>
-{% endif %}
+  {% endif %} {% endcomment %}
 
+  {% if table_name == 'Most Points Single Season' or table_name == 'Most Goals Single Season' or table_name == 'Most Assists Single Season' or table_name == 'Most Penaltys Single Season' or table_name == 'Yearly Leaders for Goals' %}
+    <td>{{ post.season__name }}</td>
+  {% endif %}
 </tr>

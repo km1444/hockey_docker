@@ -8,7 +8,7 @@
       {{ season }}
     </a>
   </h3>
-  <h3>Best of {{ stat_rule }}s </h3>
+  <h3> Best of {{ stat_rule }}s </h3>
     {% if season != '1946-47' %}
       <a class="btn btn-outline-secondary" href="{% url 'rating:best_of_season' previous_season 'point' %}" role="button"> Previous season </a>
     {% endif %}
@@ -38,6 +38,15 @@
       </tbody>
   </table>
 
+  <button id="myBtn">Show all</button>
+
+  <script>
+    document.getElementById("myBtn").addEventListener("click", displayHidden);
+
+    function displayHidden() {
+        document.getElementById("all").style.display = "";
+      }
+  </script>
   {% include 'posts/includes/paginator.html' %}
 </div>
   

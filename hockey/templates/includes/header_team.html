@@ -1,9 +1,10 @@
 {% load static %}
 {% load thumbnail %}
+
 <div style="display:flex; padding-left: 10px; padding-bottom: 10px">
 	<div class="media-item logo">
     {% thumbnail team.emblem "150" upscale=True as im %}
-      <img class="card-img-bottom mt-2" src="{{ im.url }}" alt="image">
+      <img class="card-img-bottom mt-2" src="{{ im.url }}">
     {% endthumbnail %}
 	</div>
   <div style="font: 14px; color: #000; padding-left: 10px">

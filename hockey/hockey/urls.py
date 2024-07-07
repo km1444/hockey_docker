@@ -7,6 +7,18 @@ urlpatterns = [
     path('', include('miscellaneous.urls', namespace='miscellaneous')),
     path('', include('goalkeeper_app.urls', namespace='goalkeeper_app')),
     path('', include('coach_app.urls', namespace='coach')),
+    path(
+        'liga2/',
+        include('liga2_seasons_app.urls', namespace='liga2_seasons')),
+    path(
+        'liga2/teams/',
+        include('liga2_teams_app.urls', namespace='liga2_teams')),
+    path(
+        'liga2/players/',
+        include('liga2_players_app.urls', namespace='liga2_players')),
+    path(
+        'liga2/goalkeepers/',
+        include('goalkeeper_liga2_app.urls', namespace='goalkeeper_liga2')),
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
     path('auth/', include('users.urls')),

@@ -1,37 +1,38 @@
 {% extends 'base.html' %}
 
+{% block title %}
+  {{ team }} {{ season }}
+{% endblock %}
+
 {% block description %}
   <meta name="description" content="Состав хоккейной команды {{ team }} {{ season }}">
 {% endblock %}
 
-{% block title %}
-{{ team }} {{ season }}
-{% endblock %}
-
 {% block content%}
+
   <div class="container col-sm-5 py-2">
     {% if team_info %}
-    {% for team in team_info %}
-      <h1> 
-        <a href="{% url 'rating:history_team' team.name__title %}">
-          {{ team.current_name }} 
-        </a>
-      </h1> 
-      <h4>
-      {{ team.name__city}}
-      </h4>
-    {% endfor %}
+      {% for team in team_info %}
+        <h1> 
+          <a href="{% url 'rating:history_team' team.name__title %}">
+            {{ team.current_name }} 
+          </a>
+        </h1> 
+        <h4>
+        {{ team.name__city}}
+        </h4>
+      {% endfor %}
     {% elif team_info_2 %}
-    {% for team in team_info_2 %}
-      <h1> 
-        <a href="{% url 'rating:history_team' team.name__title %}">
-          {{ team.current_name }} 
-        </a>
-      </h1> 
-      <h4>
-      {{ team.name__city}}
-      </h4>
-    {% endfor %}
+      {% for team in team_info_2 %}
+        <h1> 
+          <a href="{% url 'rating:history_team' team.name__title %}">
+            {{ team.current_name }} 
+          </a>
+        </h1> 
+        <h4>
+        {{ team.name__city}}
+        </h4>
+      {% endfor %}
     {% elif team_info_3 %}
       {% for team in team_info_3 %}
         <h1> 
@@ -43,7 +44,7 @@
           {{ team.name__city}}
         </h4>
       {% endfor %}
-      {% elif team_info_4 %}
+    {% elif team_info_4 %}
       {% for team in team_info_4 %}
         <h1> 
           <a href="{% url 'rating:history_team' team.name__title %}">
@@ -56,21 +57,17 @@
       {% endfor %}
     {% endif %}
     
-      <h4>
-        Cезон:
-        <a class="text-decoration-none text-reset" href="{% url 'rating:create_table' season %}">
-          {{ season }}
-        </a>
-      </h4>
-    {% if season != '1946-47' %}
-      <a class="btn btn-outline-secondary" href="{% url 'rating:team_players_in_season' team previous_season %}" role="button">
-        Previous season
+    <h4>
+      Cезон:
+      <a class="text-decoration-none text-reset" href="{% url 'rating:create_table' season %}">
+        {{ season }}
       </a>
+    </h4>
+    {% if season != '1946-47' %}
+      <a class="btn btn-outline-secondary" href="{% url 'rating:team_players_in_season' team previous_season %}" role="button"> Previous season </a>
     {% endif %}
     {% if season != '1990-91' %}
-      <a class="btn btn-outline-secondary" href="{% url 'rating:team_players_in_season' team next_season %}" role="button">
-        Next season
-      </a>
+      <a class="btn btn-outline-secondary" href="{% url 'rating:team_players_in_season' team next_season %}" role="button"> Next season </a>
     {% endif %}
   </div>
   
@@ -167,14 +164,14 @@
         Add Goalkeeper
       </a>
     {% endif %}      
-  </div> 
+  </div>
   
   <div class="container col-sm-5 py-2">
     <b> Coach: </b>
     {% for coach in coaches %}
       
-    <a class="text-decoration-none text-reset" href="{% url 'rating:player_detail' coach.coach_name %}">
-      {{ coach.coach_name__name }}
+      <a class="text-decoration-none text-reset" href="{% url 'rating:player_detail' coach.coach_name %}">
+        {{ coach.coach_name__name }}
       </a>
         {% comment %} {% if request.user.is_authenticated %}
           <p>
@@ -195,4 +192,5 @@
       </a>
     {% endif %}      
   </div>
+
 {% endblock %}

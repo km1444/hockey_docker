@@ -21,18 +21,18 @@
   </nav>
 
   <nav class="navbar navbar-light justify-content-between" id="mid-subnav">
-          <a class="navbar-brand" href="{% url 'rating:index' %}">
-            <i class="fa-solid fa-hockey-sticks"></i>
-            <span style="color:red">45</span>seasons
-          </a>
+    <a class="navbar-brand" href="{% url 'rating:index' %}">
+      <i class="fa-solid fa-hockey-sticks"></i>
+      <span style="color:red">45</span>seasons
+    </a>
           
-            <form class="d-flex" role="search" action="{% url 'rating:search_result' %}" methog="get">
-              <input name='q' class="form-control me-2"
-                type="search"
-                placeholder="Person or year of birth"
-                aria-label="Search"/>
-              <button class="btn btn-outline-success me-2" type="submit">Search</button>
-            </form>
+    <form class="d-flex" role="search" action="{% url 'rating:search_result' %}" methog="get">
+      <input name='q' class="form-control me-2"
+        type="search"
+        placeholder="Person or year of birth"
+        aria-label="Search"/>
+      <button class="btn btn-outline-success me-2" type="submit">Search</button>
+    </form>
   </nav>
   
   <nav class="navbar navbar-expand-sm navbar-light bg-light" id="bot-subnav">
@@ -57,17 +57,17 @@
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               Teams
             </a>
-            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <div class="team_grid">
-                {% for name, city in all_team.items %}
-                  <li>
-                    <a class="dropdown-item" href="{% url 'rating:history_team' name %}">
-                      {{ name }} - {{ city }}
-                    </a>
-                  </li>
-                {% endfor %}
-              </div>
-            </ul>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <div class="team_grid">
+                  {% for name, city in all_team.items %}
+                    <li>
+                      <a class="dropdown-item" href="{% url 'rating:history_team' name %}">
+                        {{ name }} - {{ city }}
+                      </a>
+                    </li>
+                  {% endfor %}
+                </div>
+              </ul>
           </li>
         </div>
         <div class="dropdown">
@@ -77,7 +77,7 @@
             </a>
               <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                 <li>
-                  <p class="dropdown-item stat-menu">Goal : &nbsp; 
+                  <p class="dropdown-item stat-menu">Goal : &nbsp;
                     <a class="text-decoration-none text-reset" href ="{% url 'rating:index' %}">Career </a>
                     &nbsp; | &nbsp;
                     <a class="text-decoration-none text-reset" href ="{% url 'rating:statistic' stat_rule="goal_season" %}"> Single Season</a>
@@ -86,26 +86,26 @@
                   </p> 
                 </li>
                 <li>
-                  <p class="dropdown-item stat-menu">Assist :  &nbsp; 
+                  <p class="dropdown-item stat-menu">Assist : &nbsp;
                     <a class="text-decoration-none text-reset" href ="{% url 'rating:statistic' stat_rule="assist_career" %}">Career</a>
                     &nbsp; | &nbsp;
                     <a class="text-decoration-none text-reset" href ="{% url 'rating:statistic' stat_rule="assist_season" %}">Season</a>
                   </p>   
                 </li>
                 <li>
-                  <p class="dropdown-item stat-menu">Points :  &nbsp; 
+                  <p class="dropdown-item stat-menu">Points : &nbsp;
                     <a class="text-decoration-none text-reset" href ="{% url 'rating:statistic' stat_rule="point_career" %}">Career</a>
                     &nbsp; | &nbsp;
                     <a class="text-decoration-none text-reset" href ="{% url 'rating:statistic' stat_rule="point_season" %}">Season</a>
                   </p>  
                 </li>
                 <li>
-                  <p class="dropdown-item stat-menu">Games :  &nbsp; 
+                  <p class="dropdown-item stat-menu">Games : &nbsp;
                     <a class="text-decoration-none text-reset" href ="{% url 'rating:statistic' stat_rule="game_career" %}">Career</a>
                   </p>  
                 </li>
                 <li>
-                  <p class="dropdown-item stat-menu">Penalty :  &nbsp;
+                  <p class="dropdown-item stat-menu">Penalty : &nbsp;
                     <a class="text-decoration-none text-reset" href ="{% url 'rating:statistic' stat_rule="penalty_career" %}">Career</a>
                     &nbsp; | &nbsp;
                     <a class="text-decoration-none text-reset" href ="{% url 'rating:statistic' stat_rule="penalty_season" %}">Season</a>
@@ -127,20 +127,36 @@
         </div>
         <div class="dropdown">
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <a class="nav-link dropdown-toggle" href="" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               Seasons
             </a>
-              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <div class="season_grid">
-                  {% for season in all_seasons %}
-                  <li>
-                    <a class="dropdown-item" href="{% url 'rating:create_table' season.name  %}">
-                      {{ season.name }}
-                    </a> 
-                  </li>
-                  {% endfor %}
-                </div>
-              </ul>
+            
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <div class="season_grid">
+                {% for season in all_seasons %}
+                <li>
+                  <a class="dropdown-item" href="{% url 'rating:create_table' season.name  %}">
+                    {{ season.name }}
+                  </a> 
+                </li>
+                {% endfor %}
+              </div>
+              {% comment %} <li>
+                <a class="dropdown-item" href="{% url 'rating:champions_leagues' %}">
+                  All seasons
+                </a> 
+              </li> {% endcomment %}
+            </ul>
+            
+              {% comment %} <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                {% for season in all_seasons %}
+                <li>
+                  <a class="dropdown-item" href="{% url 'rating:create_table' season.name  %}">
+                    {{ season.name }}
+                  </a> 
+                </li>
+                {% endfor %}
+              </ul> {% endcomment %}
           </li>
         </div>
         <div class="dropdown">
@@ -157,8 +173,25 @@
               </ul> 
           </li>
         </div>
+        <div class="dropdown">
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'liga2_players:liga2_most_goals_career' %}" id="navbarDropdown">
+              League 1
+            </a>
+              {% comment %} <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <li>
+                  <a class="dropdown-item" href="{% url 'liga2_seasons:liga2_index' %}">
+                    Seasons
+                  </a>
+                </li>
+              </ul> {% endcomment %}
+          </li>
+        </div>
       </ul>
     </div>
+    {% comment %} <div>
+      <a href="https://t.me/KonovalovMikhail">telegram</a>
+    </div> {% endcomment %}
   </nav>
 </div>
 

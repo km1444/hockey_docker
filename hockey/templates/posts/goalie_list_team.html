@@ -5,8 +5,8 @@
   <meta name="description" content="Вратари голкиперы {{ team }} {{ team.city }} в высшем эшелоне советского хоккея">
 {% endblock %}
 
-{% block title %}    
- {{ title }} {{ team }}
+{% block title %}
+{{ title }} {{ team }}
 {% endblock %}
 
 {% block content %}
@@ -35,9 +35,8 @@
         <tr>
             <td>.</td>
             <td class="first">
-              <a class="text-decoration-none text-reset" href="{% url 'goalkeeper_app:goalkeeper_detail' post.name__id %}"> 
-                {{ post.name__name }}
-              </a>
+              <a class="text-decoration-none text-reset"
+                 href="{% url 'goalkeeper_app:goalkeeper_detail' post.name__id %}"> {{ post.name__name }}</a>
             </td>
             <td>{{ post.games }}</td>
             <td>{{ post.goals }}</td>

@@ -12,6 +12,8 @@ from django.db.models import Max, Q, Sum
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.views.generic import ListView
 from django.views.generic.edit import DeleteView, UpdateView
+from goalkeeper_liga2_app.models import GoalkeeperStatisticLiga2
+from liga2_players_app.models import StatisticPlayer
 
 from .forms import (
     AddGoalkeeperStatisticForm, AddPlayerForm, AddStatisticForm,
@@ -141,17 +143,6 @@ def player_detail(request, id):
         'goal_against',
         'penalty'
     ).order_by('season__name')
-    coach_stat = player.coachstatistic.values(
-        'coach_name',
-        'coach_name__name',
-        'age',
-        'team__title',
-        'season__name',
-        'final_position',
-        'full_season',
-        'fired_season',
-        'came_season'
-    ).order_by('season__name')
     if player_seasons:
         game = sum(i['game'] for i in player_seasons)
         goal = sum(i['goal'] for i in player_seasons)
@@ -181,11 +172,10 @@ def player_detail(request, id):
             'position': position,
             'group_teams': group_teams,
             'amount_teams': amount_teams,
+            'exist_statistic_of_major_league': True
         }
-        if coach_stat:
-            context['coach_obj'] = coach_stat
-            context['coach'] = True
-    elif goalkeeper_seasons:
+    elif goalkeeper_seasons or GoalkeeperStatisticLiga2.objects.filter(
+            name=id).exists():
         game = sum(i['game'] for i in goalkeeper_seasons)
         goal_against = sum(i['goal_against'] for i in goalkeeper_seasons)
         penalty = sum(i['penalty'] for i in goalkeeper_seasons)
@@ -200,7 +190,7 @@ def player_detail(request, id):
         position = 'Вратарь'
         template = 'posts/profile_golie.html'
         context = {
-            'name': player,
+            'player': player,
             'count': count,
             'page_obj': goalkeeper_seasons,
             'game': game,
@@ -209,18 +199,20 @@ def player_detail(request, id):
             'position': position,
             'group_teams': group_teams,
             'amount_teams': amount_teams,
-            'goalkeeper': True
+            'goalkeeper': True,
+            'exist_statistic_goalkeeper_of_league1': True
         }
-        if coach_stat:
-            context['coach_obj'] = coach_stat
-            context['coach'] = True
     else:
         context = {
-            'name': player,
-            'coach_obj': coach_stat,
-            'coach': True
+            'player': player,
         }
-        template = 'posts/profile_golie.html'
+        template = 'posts/profile.html'
+    if StatisticPlayer.objects.filter(name=id).exists():
+        context['exist_statistic_of_league1'] = True
+    # if GoalkeeperStatisticLiga2.objects.filter(name=id).exists():
+    #     context['exist_statistic_goalkeeper_of_league1'] = True
+    if CoachStatistic.objects.filter(coach_name=id).exists():
+        context['exist_coach_stat'] = True
     return render(request, template, context)
 
 
