@@ -3,10 +3,10 @@
     <td class="first"><a class="text-decoration-none text-reset" href="{% url 'rating:player_detail' post.name__id %}"> {{ post.name__name }}</a></td>
     <td>{{ post.age }}</td>
     <td>
-        {% comment %} <a href="{% url 'rating:team_players_in_season' post.team post.season %}"> 
+        {% comment %} <a href="{% url 'rating:team_players_in_season' post.team post.season %}">  {% endcomment %}
             {{ post.team }}
-        </a> {% endcomment %}
-        {{ post.team__slug }}
+        {% comment %} </a> {% endcomment %}
+        {% comment %} {{ post.team__slug }} {% endcomment %}
     </td>
     <td>{{ post.game }}</td>
 

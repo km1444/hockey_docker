@@ -27,14 +27,6 @@ class AddStatisticLiga2Form(forms.ModelForm):
         widgets = {
         }
 
-    def __init__(self, team, season, *args):
-        super(AddStatisticLiga2Form, self).__init__(*args)
-        self.fields['team'].initial = Team.objects.get(
-            title=team)
-        self.fields['season'].initial = Season.objects.get(
-            name=season)
-        self.fields['name'].initial = Player.objects.last()
-
 
 class EditStatisticLiga2Form(forms.ModelForm):
     class Meta:
