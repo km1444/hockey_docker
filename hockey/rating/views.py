@@ -119,6 +119,7 @@ def team_players_in_season(request, team, season):
 
 def player_detail(request, id):
     context = {}
+    position = ''
     player = get_object_or_404(Player, id=id)
     player_seasons = player.statistics.values(
         'name',
@@ -209,8 +210,10 @@ def player_detail(request, id):
         template = 'posts/profile.html'
     if StatisticPlayer.objects.filter(name=id).exists():
         context['exist_statistic_of_league1'] = True
-    # if GoalkeeperStatisticLiga2.objects.filter(name=id).exists():
-    #     context['exist_statistic_goalkeeper_of_league1'] = True
+        if not position:
+            context['position'] = (
+                StatisticPlayer.objects.filter(name=id).values(
+                    'position__name')[0]['position__name'])
     if CoachStatistic.objects.filter(coach_name=id).exists():
         context['exist_coach_stat'] = True
     return render(request, template, context)
@@ -289,6 +292,13 @@ def statistic(request, stat_rule):
     """фнкция позволяющая получит сортированный список игроков
     по ключевым статистическим показателям"""
     rule = stat_rule.split('_')
+    dict_rule = {
+        'goal': 'забитым голам',
+        'assist': 'передачам',
+        'point': 'набранным очкам',
+        'penalty': 'штрафным минутам',
+        'game': 'сыгранным матчам'
+    }
     if rule[1] == 'career':
         total_for_players = Statistic.objects.values(
             'name__id',
@@ -311,6 +321,11 @@ def statistic(request, stat_rule):
             'page_obj': page_obj,
             'start_index': start_index,
             'table_name': 'Most ' + f'{rule[0].title()}''s' + ' Career',
+            'title': (
+                'Лидеры по '
+                + f'{dict_rule[rule[0]]}'
+                + ' за карьеру в высшей лиге советского хоккея'
+            )
         }
     elif rule[1] == 'season':
         total_for_players = Statistic.objects.values(
@@ -335,7 +350,12 @@ def statistic(request, stat_rule):
             'page_obj': page_obj,
             'start_index': start_index,
             'table_name':
-            'Most ' + f'{rule[0].title()}''s' + ' Single Season'
+            'Most ' + f'{rule[0].title()}''s' + ' Single Season',
+            'title': (
+                'Лидеры по '
+                + f'{dict_rule[rule[0]]}'
+                + ' за сезон в высшей лиге советского хоккея'
+            )
         }
     elif rule[1] == 'yearly':
         best_goals = Statistic.objects.values(

@@ -38,23 +38,29 @@
       </thead>
       <tbody>
         {% for post in page_obj %}
-        <tr>
-          <td>
-              <a href="{% url 'rating:create_table' post.season__name %}">
+          <tr>
+            <td>
+              {% ifchanged post.season__name %}
+                <a href="{% url 'rating:create_table' post.season__name %}">
                   {{ post.season__name }}
-              </a>
-          </td>
-          <td>{{ post.age }}</td>
-          <td>
+                </a>
+              {% endifchanged %}
+            </td>
+            <td>
+              {% ifchanged post.age %}
+                {{ post.age }}
+              {% endifchanged %}
+            </td>
+            <td>
               <a href="{% url 'rating:team_players_in_season' post.team__title post.season__name %}"> 
-                  {{ post.team__title }}
+                {{ post.team__title }}
               </a>
-          </td>
-          <td>{{ post.game }}</td>
-          <td>{{ post.goal }}</td>
-          <td>{{ post.assist }}</td>
-          <td class="table-warning">{{ post.point }}</td>
-          <td>{{ post.penalty }}</td>
+            </td>
+            <td>{{ post.game }}</td>
+            <td>{{ post.goal }}</td>
+            <td>{{ post.assist }}</td>
+            <td class="table-warning">{{ post.point }}</td>
+            <td>{{ post.penalty }}</td>
         </tr>
         {% endfor %}
       </tbody>
