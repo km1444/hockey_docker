@@ -20,9 +20,9 @@ from .forms import (
     EditGoalkeeperStatisticForm, EditStatisticForm,
 )
 from .models import (
-    DescriptionTable, GoalkeeperStatistic, Player, Playoff, Season, Statistic,
-    Team, TeamForTable, TeamForTable2, TeamForTable2Round, TeamForTable2Round2,
-    TeamForTable2Round3, TeamForTable3, TeamForTable4,
+    DescriptionTable, GoalkeeperStatistic, PersonPlayoff, Player, Playoff,
+    Season, Statistic, Team, TeamForTable, TeamForTable2, TeamForTable2Round,
+    TeamForTable2Round2, TeamForTable2Round3, TeamForTable3, TeamForTable4,
 )
 from .secondary import (
     prev_next_season, top_goal, top_point, top_season_goal, top_season_point,
@@ -545,28 +545,37 @@ def history_team(request, team):
     team_view = TeamForTable.objects.filter(
         name__title=team).select_related(
             'season',
-            'round_2',
             'playoff',
             'coach_1',
             'coach_2',
             'coach_3').order_by('-season__name')
     team_view_2 = TeamForTable2.objects.filter(
         name__title=team).select_related(
-            'season', 'round_2', 'coach_1',
+            'season', 'coach_1',
             'coach_2',
             'coach_3').order_by('-season__name')
     team_view_3 = TeamForTable3.objects.filter(
         name__title=team).select_related(
-            'season', 'round_2', 'coach_1',
+            'season', 'coach_1',
             'coach_2',
             'coach_3').order_by('-season__name')
     team_view_4 = TeamForTable4.objects.filter(
         name__title=team).select_related(
-            'season', 'round_2', 'coach_1',
+            'season', 'coach_1',
             'coach_2',
             'coach_3').order_by('-season__name')
+    round2_table1 = TeamForTable2Round.objects.filter(
+        name__title=team).select_related('season').order_by('-season__name')
+    round2_table2 = TeamForTable2Round2.objects.filter(
+        name__title=team).select_related('season').order_by('-season__name')
+    round2_table3 = TeamForTable2Round3.objects.filter(
+        name__title=team).select_related('season').order_by('-season__name')
+    result_playoff = PersonPlayoff.objects.filter(
+        team__title=team).select_related('season').order_by('-season__name')
     team_view_general = sorted(
-        chain(team_view, team_view_2, team_view_3, team_view_4),
+        chain(
+            team_view, team_view_2, team_view_3, team_view_4, round2_table1,
+            round2_table2, round2_table3, result_playoff),
         key=lambda x: x.season.name, reverse=True
     )
     team = get_object_or_404(Team, title=team)
