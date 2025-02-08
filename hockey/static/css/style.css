@@ -153,6 +153,10 @@ th {
   text-align: center;
 }
 
+th:hover {
+    cursor: pointer;
+}
+
 .countLines {
     counter-reset: trCount;
     overflow: auto;
@@ -252,12 +256,12 @@ h5 {
     cursor: pointer;
 }
 
-.table_sort td, */
+.table_sort td,
 .table_sort th {
     cursor: pointer;
 }
 
-/*
+
 .table_sort tbody tr:nth-child(even) {
     background: #e3e3e3;
 }
@@ -271,7 +275,7 @@ th.sorted[data-order="1"]::after,
 th.sorted[data-order="-1"]::after {
     right: 8px;
     position: absolute;
-} */
+}
 
 th.sorted[data-order="-1"]::after {
     content: "▼"
@@ -279,7 +283,7 @@ th.sorted[data-order="-1"]::after {
 
 th.sorted[data-order="1"]::after {
     content: "▲"
-}
+} */
 
 .season_grid {
     display: grid;

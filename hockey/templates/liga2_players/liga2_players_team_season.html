@@ -60,13 +60,13 @@
         </tr>
       <tr>
         <th>#</th>
-        <th>Name</th>
-        <th>Age</th>
-        <th>GP</th>
-        <th>G</th>
-        <th>A</th>
-        <th>PTS</th>
-        <th>PIM</th>
+        <th id="table_sort" data-type="string">Name</th>
+        <th data-type="number">Age</th>
+        <th data-type="number">GP</th>
+        <th data-type="number">G</th>
+        <th data-type="number">A</th>
+        <th data-type="number">PTS</th>
+        <th data-type="number">PIM</th>
         {% if request.user.is_authenticated %}
             <th>
               Edit
@@ -198,5 +198,7 @@
       </a>
     {% endif %}      
   </div>
+
+  <script src="/static/css/main.js"></script>
 
 {% endblock %}
