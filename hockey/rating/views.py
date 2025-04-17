@@ -10,6 +10,7 @@ from django.contrib.postgres.aggregates.general import StringAgg
 from django.core.paginator import Paginator
 from django.db.models import Max, Q, Sum
 from django.shortcuts import get_object_or_404, redirect, render, reverse
+from django.views.decorators.cache import cache_page
 from django.views.generic import ListView
 from django.views.generic.edit import DeleteView, UpdateView
 from goalkeeper_liga2_app.models import GoalkeeperStatisticLiga2
@@ -564,6 +565,7 @@ def season_leaders(request, team):
     return render(request, template, context)
 
 
+@cache_page(60 * 15)
 def history_team(request, team):
     """ функция формирования содержимого страницы с историей команды """
     team_view = TeamForTable.objects.filter(

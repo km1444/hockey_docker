@@ -92,4 +92,11 @@ urlpatterns = [
             content_type='text/plain'
         ),
     ),
+    path(
+        'sitemap.xml/',
+        TemplateView.as_view(
+            template_name='posts/sitemap.xml',
+            content_type='application/xml'
+        ),
+    )
 ]
