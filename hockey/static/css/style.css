@@ -341,3 +341,8 @@ th.sorted[data-order="1"]::after {
 		grid-template-columns: repeat(1, auto);
 	}
   }
+
+#season_emblem {
+	float: left;
+	margin-right: 5px;
+}
